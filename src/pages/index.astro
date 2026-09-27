@@ -1,11 +1,11 @@
 ---
 const workouts = [
-	{ id: 'full-body', title: 'Full Body Starter', level: 'Pemula', duration: 15, focus: 'Seluruh tubuh', color: 'lime', exercises: ['Jumping Jack', 'Bodyweight Squat', 'Incline Push-up', 'Glute Bridge'], rounds: 3 },
-	{ id: 'core', title: 'Core Foundation', level: 'Pemula', duration: 10, focus: 'Core', color: 'orange', exercises: ['Dead Bug', 'Bird Dog', 'Plank', 'Mountain Climber'], rounds: 2 },
-	{ id: 'strength', title: 'Strength Builder', level: 'Menengah', duration: 25, focus: 'Kekuatan', color: 'blue', exercises: ['Tempo Squat', 'Push-up', 'Reverse Lunge', 'Pike Push-up'], rounds: 4 },
-	{ id: 'hiit', title: 'Quick HIIT Burn', level: 'Menengah', duration: 20, focus: 'Kardio', color: 'pink', exercises: ['High Knees', 'Squat Thrust', 'Skater Jump', 'Plank Jack'], rounds: 4 },
-	{ id: 'mobility', title: 'Morning Mobility', level: 'Semua level', duration: 8, focus: 'Mobilitas', color: 'purple', exercises: ['Cat Cow', 'World’s Greatest Stretch', 'Hip Opener', 'Child’s Pose'], rounds: 2 },
-	{ id: 'lower', title: 'Lower Body Power', level: 'Lanjutan', duration: 30, focus: 'Kaki', color: 'yellow', exercises: ['Jump Squat', 'Bulgarian Split Squat', 'Single-leg Bridge', 'Calf Raise'], rounds: 4 },
+	{ id: 'full-body', title: 'Full Body Starter', level: 'Pemula', duration: 15, focus: 'Seluruh tubuh', color: 'lime', exercises: ['Jumping Jack', 'Bodyweight Squat', 'Incline Push-up', 'Glute Bridge'], rounds: 3, target: 'Seluruh tubuh', tip: 'Jaga ritme napas dan mendarat lembut.', easier: 'Step jack tanpa lompatan.' },
+	{ id: 'core', title: 'Core Foundation', level: 'Pemula', duration: 10, focus: 'Core', color: 'orange', exercises: ['Dead Bug', 'Bird Dog', 'Plank', 'Mountain Climber'], rounds: 2, target: 'Perut dan punggung', tip: 'Tekan punggung bawah ke lantai saat core bergerak.', easier: 'Kurangi durasi plank menjadi 15 detik.' },
+	{ id: 'strength', title: 'Strength Builder', level: 'Menengah', duration: 25, focus: 'Kekuatan', color: 'blue', exercises: ['Tempo Squat', 'Push-up', 'Reverse Lunge', 'Pike Push-up'], rounds: 4, target: 'Kaki, dada, bahu', tip: 'Turun perlahan, dorong lantai dengan stabil.', easier: 'Gunakan lutut untuk push-up.' },
+	{ id: 'hiit', title: 'Quick HIIT Burn', level: 'Menengah', duration: 20, focus: 'Kardio', color: 'pink', exercises: ['High Knees', 'Squat Thrust', 'Skater Jump', 'Plank Jack'], rounds: 4, target: 'Jantung dan seluruh tubuh', tip: 'Pertahankan intensitas, tapi tetap bisa bicara pendek.', easier: 'Ganti lompatan dengan langkah cepat.' },
+	{ id: 'mobility', title: 'Morning Mobility', level: 'Semua level', duration: 8, focus: 'Mobilitas', color: 'purple', exercises: ['Cat Cow', 'World’s Greatest Stretch', 'Hip Opener', 'Child’s Pose'], rounds: 2, target: 'Pinggul dan tulang belakang', tip: 'Bergerak dalam rentang nyaman, tanpa memaksa.', easier: 'Tahan setiap posisi lebih singkat.' },
+	{ id: 'lower', title: 'Lower Body Power', level: 'Lanjutan', duration: 30, focus: 'Kaki', color: 'yellow', exercises: ['Jump Squat', 'Bulgarian Split Squat', 'Single-leg Bridge', 'Calf Raise'], rounds: 4, target: 'Glutes dan kaki', tip: 'Dorong dari telapak kaki dan jaga lutut searah jari.', easier: 'Hapus lompatan dan gunakan squat biasa.' },
 ];
 ---
 
@@ -16,8 +16,16 @@ const workouts = [
 		<meta name="viewport" content="width=device-width" />
 		<meta name="description" content="Program workout di rumah tanpa alat. Pilih latihan, nyalakan timer, dan pantau progresmu." />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<meta name="theme-color" content="#18201a" />
+		<meta property="og:title" content="GERAK — Workout di Rumah" />
+		<meta property="og:description" content="Workout rumahan tanpa alat, lengkap dengan timer dan progres." />
+		<meta property="og:type" content="website" />
+		<meta property="og:image" content="/favicon.svg" />
+		<meta name="twitter:card" content="summary" />
 		<meta name="generator" content={Astro.generator} />
 		<title>GERAK — Workout di Rumah</title>
+		<script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'GERAK', description: 'Program workout di rumah tanpa alat', inLanguage: 'id-ID' })}></script>
 	</head>
 	<body>
 		<header class="nav wrap">
@@ -50,7 +58,7 @@ const workouts = [
 					{workouts.map((workout, index) => (
 						<article class={`card ${workout.color}`} data-level={workout.level} data-id={workout.id}>
 							<div class="card-top"><span class="number">0{index + 1}</span><span class="tag">{workout.level}</span></div><div class="mini-figure" aria-hidden="true"><span></span><i></i><b></b></div>
-							<div class="card-body"><p>{workout.focus}</p><h3>{workout.title}</h3><div class="meta"><span>◷ {workout.duration} menit</span><span>↻ {workout.rounds} ronde</span></div><button class="start-workout" type="button">Mulai latihan <span>→</span></button></div>
+							<div class="card-body"><p>{workout.focus}</p><h3>{workout.title}</h3><div class="meta"><span>◷ {workout.duration} menit</span><span>↻ {workout.rounds} ronde</span></div><div class="card-actions"><button class="details-workout" type="button">Detail</button><button class="start-workout" type="button">Mulai latihan <span>→</span></button></div></div>
 						</article>
 					))}
 				</div>
@@ -63,64 +71,84 @@ const workouts = [
 
 			<section class="progress wrap" id="progres">
 				<div><p class="eyebrow"><span></span> Progres minggu ini</p><h2>Konsisten lebih penting<br />daripada sempurna.</h2><p>Setiap latihan selesai otomatis tersimpan di perangkat ini.</p></div>
-				<div class="progress-card"><div class="progress-title"><div><small>LATIHAN SELESAI</small><strong id="completed-count">0</strong><span> / 4 minggu ini</span></div><span class="bolt">ϟ</span></div><div class="bar"><span id="progress-bar"></span></div><div class="days">{['S', 'S', 'R', 'K', 'J', 'S', 'M'].map((day, index) => <div data-day={index}><i>✓</i><span>{day}</span></div>)}</div><button id="reset-progress" type="button">Reset progres</button></div>
+				<div class="progress-card"><div class="progress-title"><div><small>LATIHAN SELESAI</small><strong id="completed-count">0</strong><span> / <b id="weekly-goal">4</b> minggu ini</span></div><span class="bolt">ϟ</span></div><div class="bar"><span id="progress-bar"></span></div><div class="days">{['S', 'S', 'R', 'K', 'J', 'S', 'M'].map((day, index) => <div data-day={index}><i>✓</i><span>{day}</span></div>)}</div><div class="progress-stats"><span><b id="streak-count">0</b> hari streak</span><span><b id="total-minutes">0</b> total menit</span></div><div class="progress-controls"><label>Target <select id="goal-select"><option>3</option><option selected>4</option><option>5</option><option>7</option></select> / minggu</label><button id="export-progress" type="button">Export data</button><button id="reset-progress" type="button">Reset</button></div></div>
 			</section>
+			<section class="safety wrap"><strong>⚠ Dengarkan tubuhmu.</strong><span>Berhenti bila terasa nyeri tajam, pusing, atau sesak. Konsultasikan kondisi medis dengan tenaga kesehatan sebelum mulai.</span></section>
 		</main>
 
-		<footer><div class="wrap"><a class="brand" href="#top"><span>G</span>GERAK</a><p>Gerak kecil hari ini. Badan kuat esok hari.</p><small>© 2026 GERAK</small></div></footer>
+		<footer><div class="wrap"><a class="brand" href="#top"><span>G</span>GERAK</a><p>Gerak kecil hari ini. Badan kuat esok hari.</p><div class="footer-actions"><button id="share-site" type="button">Bagikan</button><small>© 2026 GERAK</small></div></div></footer>
 
-		<dialog id="workout-modal"><button class="close" id="close-modal" aria-label="Tutup" type="button">×</button><p class="modal-kicker">LATIHAN BERLANGSUNG</p><h2 id="modal-title">Full Body Starter</h2><div class="round" id="round-label">Ronde 1 / 3</div><div class="timer-ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="53"></circle><circle id="timer-progress" cx="60" cy="60" r="53"></circle></svg><strong id="timer">30</strong><span>DETIK</span></div><h3 id="exercise-name">Jumping Jack</h3><p id="timer-status">Siap? Tekan mulai.</p><div class="modal-actions"><button id="timer-toggle" class="button primary" type="button">Mulai</button><button id="timer-skip" class="button ghost" type="button">Lewati →</button></div></dialog>
+		<dialog id="onboarding-modal"><button class="close close-onboarding" aria-label="Tutup" type="button">×</button><p class="modal-kicker">MULAI DARI SINI</p><h2>Temukan latihanmu</h2><p>Jawab tiga hal. GERAK pilihkan titik mulai yang pas.</p><label>Level <select id="pref-level"><option>Pemula</option><option>Menengah</option><option>Lanjutan</option></select></label><label>Target <select id="pref-focus"><option>Seluruh tubuh</option><option>Core</option><option>Kardio</option><option>Mobilitas</option><option>Kekuatan</option></select></label><label>Waktu <select id="pref-duration"><option value="10">10 menit</option><option value="15">15 menit</option><option value="20">20 menit</option><option value="30">30 menit</option></select></label><button id="recommend" class="button primary" type="button">Rekomendasikan →</button></dialog>
+		<dialog id="detail-modal"><button class="close close-detail" aria-label="Tutup" type="button">×</button><p class="modal-kicker">TENTANG PROGRAM</p><h2 id="detail-title"></h2><p id="detail-target"></p><div class="detail-box"><strong>Tips teknik</strong><span id="detail-tip"></span></div><div class="detail-box"><strong>Modifikasi pemula</strong><span id="detail-easier"></span></div><div class="modal-actions"><button id="detail-start" class="button primary" type="button">Mulai latihan</button><button id="detail-share" class="button ghost" type="button">Bagikan</button></div></dialog>
+		<dialog id="workout-modal"><button class="close" id="close-modal" aria-label="Tutup" type="button">×</button><p class="modal-kicker" id="phase-label">LATIHAN BERLANGSUNG</p><h2 id="modal-title">Full Body Starter</h2><div class="round" id="round-label">Ronde 1 / 3</div><label class="interval-choice">Interval <select id="interval-choice"><option value="20,10">20 / 10</option><option value="30,15" selected>30 / 15</option><option value="40,20">40 / 20</option></select></label><div class="timer-ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="53"></circle><circle id="timer-progress" cx="60" cy="60" r="53"></circle></svg><strong id="timer">30</strong><span>DETIK</span></div><h3 id="exercise-name">Jumping Jack</h3><p id="timer-status">Siap? Tekan mulai.</p><div class="modal-actions"><button id="timer-toggle" class="button primary" type="button">Mulai</button><button id="timer-skip" class="button ghost" type="button">Lewati →</button></div></dialog>
 
 		<script define:vars={{ workouts }}>
 			const modal = document.querySelector('#workout-modal');
-			const timerText = document.querySelector('#timer');
-			const timerProgress = document.querySelector('#timer-progress');
-			const title = document.querySelector('#modal-title');
-			const exerciseName = document.querySelector('#exercise-name');
-			const roundLabel = document.querySelector('#round-label');
-			const status = document.querySelector('#timer-status');
-			const toggle = document.querySelector('#timer-toggle');
-			let selected, interval;
-			let seconds = 30, exerciseIndex = 0, round = 1, running = false;
-
+			const timerText = document.querySelector('#timer'), timerProgress = document.querySelector('#timer-progress');
+			const title = document.querySelector('#modal-title'), exerciseName = document.querySelector('#exercise-name');
+			const roundLabel = document.querySelector('#round-label'), status = document.querySelector('#timer-status');
+			const toggle = document.querySelector('#timer-toggle'), phaseLabel = document.querySelector('#phase-label');
+			let selected, interval, phase = 'work', seconds = 30, exerciseIndex = 0, round = 1, running = false, workSeconds = 30, restSeconds = 15;
+			const json = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; } };
 			const updateProgress = () => {
-				const completed = JSON.parse(localStorage.getItem('gerak-progress') || '[]');
-				document.querySelector('#completed-count').textContent = Math.min(completed.length, 99);
-				document.querySelector('#progress-bar').style.width = `${Math.min(completed.length / 4 * 100, 100)}%`;
+				const completed = json('gerak-progress', []), history = json('gerak-history', []), goal = Number(localStorage.getItem('gerak-goal') || 4);
+				document.querySelector('#completed-count').textContent = completed.length;
+				document.querySelector('#weekly-goal').textContent = goal; document.querySelector('#goal-select').value = goal;
+				document.querySelector('#progress-bar').style.width = `${Math.min(completed.length / goal * 100, 100)}%`;
 				document.querySelectorAll('.days div').forEach((day, index) => day.classList.toggle('done', completed.includes(index)));
+				document.querySelector('#total-minutes').textContent = history.reduce((sum, item) => sum + item.minutes, 0);
+				const dates = [...new Set(history.map(item => item.date))].sort().reverse(); let streak = 0, cursor = new Date();
+				while (dates.includes(cursor.toISOString().slice(0, 10))) { streak++; cursor.setDate(cursor.getDate() - 1); }
+				document.querySelector('#streak-count').textContent = streak;
 			};
-			const renderTimer = () => { timerText.textContent = seconds; timerProgress.style.strokeDashoffset = 333 - (333 * seconds / 30); };
+			const speak = text => { if ('speechSynthesis' in window) { speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(text)); } };
+			const renderTimer = () => { timerText.textContent = seconds; timerProgress.style.strokeDashoffset = 333 - (333 * seconds / (phase === 'work' ? workSeconds : restSeconds)); };
 			const finish = () => {
 				clearInterval(interval); running = false;
-				const completed = JSON.parse(localStorage.getItem('gerak-progress') || '[]');
-				const today = new Date().getDay(), dayIndex = today === 0 ? 6 : today - 1;
+				const completed = json('gerak-progress', []), today = new Date().getDay(), dayIndex = today === 0 ? 6 : today - 1;
 				if (!completed.includes(dayIndex)) completed.push(dayIndex);
-				localStorage.setItem('gerak-progress', JSON.stringify(completed)); updateProgress();
-				title.textContent = 'Latihan selesai!'; exerciseName.textContent = 'Kerja bagus.'; status.textContent = 'Satu langkah lebih kuat dari kemarin.'; toggle.textContent = 'Tutup'; toggle.dataset.finished = 'true';
+				localStorage.setItem('gerak-progress', JSON.stringify(completed)); localStorage.setItem('gerak-last-workout', new Date().toISOString());
+				const history = json('gerak-history', []); history.push({ date: new Date().toISOString().slice(0, 10), workout: selected.title, minutes: selected.duration }); localStorage.setItem('gerak-history', JSON.stringify(history)); updateProgress();
+				title.textContent = 'Latihan selesai!'; exerciseName.textContent = 'Kerja bagus.'; status.textContent = 'Satu langkah lebih kuat dari kemarin.'; toggle.textContent = 'Tutup'; toggle.dataset.finished = 'true'; speak('Latihan selesai. Kerja bagus.');
 			};
 			const nextExercise = () => {
-				exerciseIndex++; if (exerciseIndex >= selected.exercises.length) { exerciseIndex = 0; round++; }
+				phase = 'work'; exerciseIndex++;
+				if (exerciseIndex >= selected.exercises.length) { exerciseIndex = 0; round++; }
 				if (round > selected.rounds) return finish();
-				seconds = 30; exerciseName.textContent = selected.exercises[exerciseIndex]; roundLabel.textContent = `Ronde ${round} / ${selected.rounds}`; status.textContent = 'Jaga napas. Kamu bisa.'; renderTimer();
+				seconds = workSeconds; phaseLabel.textContent = 'LATIHAN BERLANGSUNG'; exerciseName.textContent = selected.exercises[exerciseIndex]; roundLabel.textContent = `Ronde ${round} / ${selected.rounds}`; status.textContent = 'Jaga napas. Kamu bisa.'; renderTimer(); speak(selected.exercises[exerciseIndex]);
 			};
-			const openWorkout = (id) => {
-				selected = workouts.find(item => item.id === id) || workouts[1]; clearInterval(interval); running = false; seconds = 30; exerciseIndex = 0; round = 1;
-				title.textContent = selected.title; exerciseName.textContent = selected.exercises[0]; roundLabel.textContent = `Ronde 1 / ${selected.rounds}`; status.textContent = 'Siap? Tekan mulai.'; toggle.textContent = 'Mulai'; delete toggle.dataset.finished; renderTimer(); modal.showModal();
+			const rest = () => { phase = 'rest'; seconds = restSeconds; phaseLabel.textContent = 'ISTIRAHAT'; exerciseName.textContent = 'Tarik napas'; status.textContent = 'Siapkan gerakan berikutnya.'; renderTimer(); speak('Istirahat'); };
+			const openWorkout = id => {
+				selected = workouts.find(item => item.id === id) || workouts[1]; clearInterval(interval); running = false; phase = 'work'; seconds = workSeconds; exerciseIndex = 0; round = 1;
+				title.textContent = selected.title; phaseLabel.textContent = 'LATIHAN BERLANGSUNG'; exerciseName.textContent = selected.exercises[0]; roundLabel.textContent = `Ronde 1 / ${selected.rounds}`; status.textContent = 'Siap? Tekan mulai.'; toggle.textContent = 'Mulai'; delete toggle.dataset.finished; renderTimer(); modal.showModal();
 			};
+			const detailModal = document.querySelector('#detail-modal');
+			const showDetail = id => { const item = workouts.find(workout => workout.id === id); detailModal.dataset.id = id; document.querySelector('#detail-title').textContent = item.title; document.querySelector('#detail-target').textContent = `Target: ${item.target}`; document.querySelector('#detail-tip').textContent = item.tip; document.querySelector('#detail-easier').textContent = item.easier; detailModal.showModal(); };
 			document.querySelectorAll('.start-workout').forEach(button => button.addEventListener('click', () => openWorkout(button.closest('.card').dataset.id)));
+			document.querySelectorAll('.details-workout').forEach(button => button.addEventListener('click', () => showDetail(button.closest('.card').dataset.id)));
 			document.querySelector('#quick-start').addEventListener('click', () => openWorkout('core'));
 			document.querySelector('#close-modal').addEventListener('click', () => { clearInterval(interval); running = false; modal.close(); });
+			document.querySelector('.close-detail').addEventListener('click', () => detailModal.close());
+			document.querySelector('#detail-start').addEventListener('click', () => { detailModal.close(); openWorkout(detailModal.dataset.id); });
+			document.querySelector('#detail-share').addEventListener('click', () => share(`Coba program ${document.querySelector('#detail-title').textContent} di GERAK`));
 			document.querySelector('#timer-skip').addEventListener('click', nextExercise);
+			document.querySelector('#interval-choice').addEventListener('change', event => { [workSeconds, restSeconds] = event.target.value.split(',').map(Number); if (!running) { seconds = workSeconds; phase = 'work'; renderTimer(); } });
 			toggle.addEventListener('click', () => {
 				if (toggle.dataset.finished) return modal.close();
 				running = !running; toggle.textContent = running ? 'Jeda' : 'Lanjut'; status.textContent = running ? 'Terus bergerak!' : 'Dijeda.'; clearInterval(interval);
-				if (running) interval = setInterval(() => { seconds--; renderTimer(); if (seconds <= 0) nextExercise(); }, 1000);
+				if (running) interval = setInterval(() => { seconds--; renderTimer(); if (seconds <= 0) { if (phase === 'work') rest(); else nextExercise(); } }, 1000);
 			});
-			document.querySelectorAll('.filters button').forEach(button => button.addEventListener('click', () => {
-				document.querySelectorAll('.filters button').forEach(item => item.classList.remove('active')); button.classList.add('active');
-				document.querySelectorAll('.card').forEach(card => card.hidden = button.dataset.filter !== 'Semua' && card.dataset.level !== button.dataset.filter);
-			}));
-			document.querySelector('#reset-progress').addEventListener('click', () => { localStorage.removeItem('gerak-progress'); updateProgress(); });
+			document.querySelectorAll('.filters button').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('.filters button').forEach(item => item.classList.remove('active')); button.classList.add('active'); document.querySelectorAll('.card').forEach(card => card.hidden = button.dataset.filter !== 'Semua' && card.dataset.level !== button.dataset.filter); }));
+			document.querySelector('#goal-select').addEventListener('change', event => { localStorage.setItem('gerak-goal', event.target.value); updateProgress(); });
+			document.querySelector('#export-progress').addEventListener('click', () => { const blob = new Blob([JSON.stringify(json('gerak-history', []), null, 2)], { type: 'application/json' }); const link = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'gerak-progress.json' }); link.click(); URL.revokeObjectURL(link.href); });
+			document.querySelector('#reset-progress').addEventListener('click', () => { localStorage.removeItem('gerak-progress'); localStorage.removeItem('gerak-history'); localStorage.removeItem('gerak-last-workout'); updateProgress(); });
+			const share = async text => { if (navigator.share) await navigator.share({ title: 'GERAK', text, url: location.href }); else await navigator.clipboard?.writeText(`${text} ${location.href}`); };
+			document.querySelector('#share-site').addEventListener('click', () => share('Workout di rumah tanpa alat — GERAK'));
+			const onboarding = document.querySelector('#onboarding-modal');
+			document.querySelector('.close-onboarding').addEventListener('click', () => onboarding.close());
+			document.querySelector('#recommend').addEventListener('click', () => { const level = document.querySelector('#pref-level').value, focus = document.querySelector('#pref-focus').value, duration = Number(document.querySelector('#pref-duration').value); const match = workouts.find(item => item.level === level && item.focus === focus) || workouts.find(item => item.level === level && item.duration <= duration) || workouts[0]; onboarding.close(); document.querySelector(`[data-id="${match.id}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' }); showDetail(match.id); localStorage.setItem('gerak-preferences', JSON.stringify({ level, focus, duration })); });
+			if (!localStorage.getItem('gerak-preferences')) setTimeout(() => onboarding.showModal(), 800);
+			if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 			updateProgress();
 		</script>
 	</body>
@@ -135,4 +163,18 @@ const workouts = [
 	.how{padding:110px 0;background:var(--ink);color:white}.light .eyebrow{color:var(--lime)}.light .eyebrow span{background:var(--lime)}.how h2{font-size:clamp(40px,5vw,64px);line-height:1;letter-spacing:-3px}.how h2 em{color:var(--lime)}.steps{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #434943}.steps>div{padding:45px 38px 0 0;position:relative}.steps>div+div{padding-left:38px;border-left:1px solid #434943}.steps b{font-size:12px;color:#8d968e}.steps span{display:grid;place-items:center;width:62px;height:62px;background:var(--lime);color:var(--ink);border-radius:50%;font-size:25px;margin:32px 0}.steps h3{font-size:24px;margin-bottom:10px}.steps p{color:#aeb5af;line-height:1.6;max-width:280px}.progress{padding-block:120px;display:grid;grid-template-columns:1fr 1fr;gap:90px;align-items:center}.progress>div>p:last-child{color:#6d736d;max-width:480px;line-height:1.7;margin-top:25px}.progress-card{background:white;border:1px solid var(--ink);border-radius:18px;padding:35px;box-shadow:8px 8px 0 var(--lime)}.progress-title{display:flex;justify-content:space-between;align-items:center}.progress-title small{display:block;font-size:10px;letter-spacing:1.4px;font-weight:700}.progress-title strong{font:700 48px 'Space Grotesk'}.progress-title span{color:#747a75}.bolt{display:grid;place-items:center!important;background:var(--orange);color:white!important;width:55px;height:55px;border-radius:50%;font-size:30px}.bar{height:10px;background:#e7e8e2;border-radius:10px;margin:25px 0;overflow:hidden}.bar span{display:block;height:100%;width:0;background:var(--orange);border-radius:10px;transition:.3s}.days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.days div{text-align:center}.days i{display:grid;place-items:center;aspect-ratio:1;border-radius:50%;border:1px solid #d6d8d3;color:transparent;font-style:normal}.days span{display:block;margin-top:7px;font-size:10px;font-weight:700;color:#8b908b}.days .done i{background:var(--lime);border-color:var(--ink);color:var(--ink)}#reset-progress{display:block;margin:22px auto 0;background:none;border:0;text-decoration:underline;color:#777;cursor:pointer;font-size:11px}footer{background:#e6e1d5;padding:45px 0}footer .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px}footer p,footer small{margin:0;color:#727771;font-size:12px}
 	dialog{width:min(470px,calc(100% - 30px));border:1px solid var(--ink);border-radius:24px;padding:38px;text-align:center;color:var(--ink);box-shadow:10px 10px 0 var(--lime)}dialog::backdrop{background:rgba(15,20,16,.75);backdrop-filter:blur(5px)}.close{position:absolute;right:18px;top:14px;background:none;border:0;font-size:28px;cursor:pointer}.modal-kicker{font-size:10px;letter-spacing:1.5px;font-weight:700;color:var(--orange)}dialog h2{font-size:30px;margin-bottom:8px}.round{font-size:12px;color:#777}.timer-ring{position:relative;width:190px;height:190px;margin:25px auto;display:grid;place-items:center}.timer-ring svg{position:absolute;width:100%;transform:rotate(-90deg)}.timer-ring circle{fill:none;stroke:#e6e8e2;stroke-width:7}.timer-ring circle+circle{stroke:var(--orange);stroke-linecap:round;stroke-dasharray:333;stroke-dashoffset:0;transition:.25s}.timer-ring strong{font:700 62px 'Space Grotesk';line-height:1}.timer-ring span{position:absolute;top:124px;font-size:9px;letter-spacing:1px}.modal-actions{display:flex;justify-content:center;gap:10px;margin-top:25px}dialog h3{font-size:24px;margin-bottom:4px}dialog>p:last-of-type{color:#777}
 	@media(max-width:900px){nav{display:none}.hero{grid-template-columns:1fr;padding-top:55px}.hero-visual{height:480px}.grid{grid-template-columns:repeat(2,1fr)}.progress{grid-template-columns:1fr;gap:45px}.steps>div{padding-right:20px}.steps>div+div{padding-left:20px}}@media(max-width:620px){.wrap{width:min(100% - 28px,1180px)}.nav{height:68px}.nav-cta{font-size:0;padding:9px}.nav-cta span{font-size:18px}.hero{padding-block:45px}.hero-copy h1{font-size:52px;letter-spacing:-3px}.hero-visual{height:420px}.figure{transform:translateX(-50%) scale(.82);transform-origin:top}.stat-place{bottom:20px}.scribble{display:none}.section-head{align-items:flex-start;flex-direction:column;gap:20px}.section-head>p{width:auto}.programs{padding-block:80px}.grid{grid-template-columns:1fr}.card{min-height:410px}.steps{grid-template-columns:1fr}.steps>div,.steps>div+div{border-left:0;border-top:1px solid #434943;padding:30px 0}.steps>div:first-child{border-top:0}.steps span{margin:18px 0}.how{padding:80px 0}.progress{padding-block:80px}.progress-card{padding:24px 18px}.days{gap:5px}footer .wrap{flex-direction:column;text-align:center}dialog{padding:32px 20px}.hero-actions .button{width:100%}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+	.safety{margin-bottom:70px;padding:24px 28px;background:#fff8ea;border:1px solid #f2cf97;border-radius:18px;display:flex;gap:12px;align-items:center;font-size:14px;color:#6b4d1b}
+	.safety strong{white-space:nowrap}
+	.card-actions{display:flex;gap:10px;margin-top:15px;align-items:center}
+	.details-workout{background:none;border:1px solid var(--line);border-radius:99px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer}
+	.footer-actions{display:flex;gap:15px;align-items:center}
+	#share-site{background:none;border:1px solid var(--ink);border-radius:99px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer}
+	.detail-box{background:#f8f9f6;border:1px solid var(--line);border-radius:14px;padding:14px;margin-block:12px;text-align:left}
+	.detail-box strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;color:var(--orange)}
+	#onboarding-modal label{display:block;text-align:left;margin-block:12px;font-weight:700;font-size:13px}
+	#onboarding-modal select{width:100%;margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit}
+	#recommend{margin-top:12px;width:100%}
+	.progress-stats{display:flex;justify-content:space-around;padding:18px 0;margin-top:18px;border-block:1px solid var(--line);font-size:12px}.progress-stats b{font-size:20px;color:var(--orange)}
+	.progress-controls{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:18px;flex-wrap:wrap}.progress-controls label,.interval-choice{font-size:11px;font-weight:700}.progress-controls select,.interval-choice select{padding:5px;border:1px solid var(--line);border-radius:7px;background:white}.progress-controls button{background:none;border:0;text-decoration:underline;color:#666;font-size:11px;cursor:pointer}.interval-choice{display:block;margin-top:12px}
+	@media(max-width:620px){.safety{align-items:flex-start;flex-direction:column}.card-actions{align-items:stretch}.footer-actions{flex-direction:column}}
 </style>

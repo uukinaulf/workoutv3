@@ -1,0 +1,16 @@
+{
+  "name": "GERAK — Workout di Rumah",
+  "short_name": "GERAK",
+  "description": "Website workout rumahan tanpa alat. Cepat, ringan, dan gratis.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f1e8",
+  "theme_color": "#18201a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

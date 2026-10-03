@@ -41,13 +41,16 @@ const exerciseGuide = {
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="description" content="Program workout di rumah tanpa alat. Pilih latihan, nyalakan timer, dan pantau progresmu." />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="manifest" href="/manifest.webmanifest" />
 		<meta name="theme-color" content="#18201a" />
 		<meta property="og:title" content="GERAK — Workout di Rumah" />
 		<meta property="og:description" content="Workout rumahan tanpa alat, lengkap dengan timer dan progres." />
 		<meta property="og:type" content="website" />
-		<meta property="og:image" content="/favicon.svg" />
+		<meta property="og:image" content="https://gerak.pages.dev/favicon.svg" />
 		<meta name="twitter:card" content="summary" />
 		<meta name="generator" content={Astro.generator} />
 		<title>GERAK — Workout di Rumah</title>
@@ -104,7 +107,6 @@ const exerciseGuide = {
 
 		<footer><div class="wrap"><a class="brand" href="#top"><span>G</span>GERAK</a><p>Gerak kecil hari ini. Badan kuat esok hari.</p><div class="footer-actions"><button id="share-site" type="button">Bagikan</button><small>© 2026 GERAK</small></div></div></footer>
 
-		<dialog id="onboarding-modal"><button class="close close-onboarding" aria-label="Tutup" type="button">×</button><p class="modal-kicker">MULAI DARI SINI</p><h2>Temukan latihanmu</h2><p>Jawab tiga hal. GERAK pilihkan titik mulai yang pas.</p><label>Level <select id="pref-level"><option>Pemula</option><option>Menengah</option><option>Lanjutan</option></select></label><label>Target <select id="pref-focus"><option>Seluruh tubuh</option><option>Core</option><option>Kardio</option><option>Mobilitas</option><option>Kekuatan</option></select></label><label>Waktu <select id="pref-duration"><option value="10">10 menit</option><option value="15">15 menit</option><option value="20">20 menit</option><option value="30">30 menit</option></select></label><button id="recommend" class="button primary" type="button">Rekomendasikan →</button></dialog>
 		<dialog id="detail-modal"><button class="close close-detail" aria-label="Tutup" type="button">×</button><p class="modal-kicker">TENTANG PROGRAM</p><h2 id="detail-title"></h2><p id="detail-target"></p><div class="program-summary"><span id="detail-duration"></span><span id="detail-rounds"></span></div><div class="detail-box"><strong>Tips program</strong><span id="detail-tip"></span></div><div class="exercise-list" id="exercise-list"></div><div class="modal-actions"><button id="detail-start" class="button primary" type="button">Mulai latihan</button><button id="detail-share" class="button ghost" type="button">Bagikan</button></div></dialog>
 		<dialog id="workout-modal"><button class="close" id="close-modal" aria-label="Tutup" type="button">×</button><p class="modal-kicker" id="phase-label">LATIHAN BERLANGSUNG</p><h2 id="modal-title">Full Body Starter</h2><div class="round" id="round-label">Ronde 1 / 3</div><label class="interval-choice">Interval <select id="interval-choice"><option value="20,10">20 / 10</option><option value="30,15" selected>30 / 15</option><option value="40,20">40 / 20</option></select></label><div class="timer-ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="53"></circle><circle id="timer-progress" cx="60" cy="60" r="53"></circle></svg><strong id="timer">30</strong><span>DETIK</span></div><h3 id="exercise-name">Jumping Jack</h3><p id="timer-status">Siap? Tekan mulai.</p><details class="active-guide"><summary>Cara melakukan</summary><p id="active-steps"></p><small id="active-avoid"></small></details><div class="modal-actions"><button id="timer-toggle" class="button primary" type="button">Mulai</button><button id="timer-skip" class="button ghost" type="button">Lewati →</button></div></dialog>
 
@@ -115,38 +117,48 @@ const exerciseGuide = {
 			const roundLabel = document.querySelector('#round-label'), status = document.querySelector('#timer-status');
 			const toggle = document.querySelector('#timer-toggle'), phaseLabel = document.querySelector('#phase-label');
 			const showExerciseGuide = name => { const guide = exerciseGuide[name]; document.querySelector('#active-steps').textContent = guide.steps; document.querySelector('#active-avoid').textContent = `Hindari: ${guide.avoid}`; };
-			let selected, interval, phase = 'work', seconds = 30, exerciseIndex = 0, round = 1, running = false, workSeconds = 30, restSeconds = 15;
+			let selected, interval, phase = 'work', seconds = 30, exerciseIndex = 0, round = 1, running = false, workSeconds = 30, restSeconds = 15, endAt = 0, lastSecond = -1, wakeLock = null, audioCtx;
 			const json = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; } };
+			const localDate = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+			const weekKey = () => { const date = new Date(); date.setDate(date.getDate() - (date.getDay() + 6) % 7); return `gerak-progress-${localDate(date)}`; };
+			const beep = (frequency = 880, duration = 0.1) => { try { audioCtx ||= new (window.AudioContext || window.webkitAudioContext)(); const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.value = frequency; gain.gain.setValueAtTime(0.15, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration); osc.connect(gain).connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration); } catch {} };
+			const requestWakeLock = async () => { try { wakeLock = await navigator.wakeLock?.request('screen'); } catch {} };
+			const releaseWakeLock = async () => { try { await wakeLock?.release(); } catch {} wakeLock = null; };
 			const updateProgress = () => {
-				const completed = json('gerak-progress', []), history = json('gerak-history', []), goal = Number(localStorage.getItem('gerak-goal') || 4);
+				const completed = json(weekKey(), []), history = json('gerak-history', []), goal = Number(localStorage.getItem('gerak-goal') || 4);
 				document.querySelector('#completed-count').textContent = completed.length;
 				document.querySelector('#weekly-goal').textContent = goal; document.querySelector('#goal-select').value = goal;
 				document.querySelector('#progress-bar').style.width = `${Math.min(completed.length / goal * 100, 100)}%`;
 				document.querySelectorAll('.days div').forEach((day, index) => day.classList.toggle('done', completed.includes(index)));
 				document.querySelector('#total-minutes').textContent = history.reduce((sum, item) => sum + item.minutes, 0);
 				const dates = [...new Set(history.map(item => item.date))].sort().reverse(); let streak = 0, cursor = new Date();
-				while (dates.includes(cursor.toISOString().slice(0, 10))) { streak++; cursor.setDate(cursor.getDate() - 1); }
+				while (dates.includes(localDate(cursor))) { streak++; cursor.setDate(cursor.getDate() - 1); }
 				document.querySelector('#streak-count').textContent = streak;
 			};
 			const speak = text => { if ('speechSynthesis' in window) { speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(text)); } };
 			const renderTimer = () => { timerText.textContent = seconds; timerProgress.style.strokeDashoffset = 333 - (333 * seconds / (phase === 'work' ? workSeconds : restSeconds)); };
 			const finish = () => {
-				clearInterval(interval); running = false;
-				const completed = json('gerak-progress', []), today = new Date().getDay(), dayIndex = today === 0 ? 6 : today - 1;
+				clearInterval(interval); running = false; releaseWakeLock(); beep(660, 0.25);
+				const completed = json(weekKey(), []), today = new Date().getDay(), dayIndex = today === 0 ? 6 : today - 1;
 				if (!completed.includes(dayIndex)) completed.push(dayIndex);
-				localStorage.setItem('gerak-progress', JSON.stringify(completed)); localStorage.setItem('gerak-last-workout', new Date().toISOString());
-				const history = json('gerak-history', []); history.push({ date: new Date().toISOString().slice(0, 10), workout: selected.title, minutes: selected.duration }); localStorage.setItem('gerak-history', JSON.stringify(history)); updateProgress();
+				localStorage.setItem(weekKey(), JSON.stringify(completed)); localStorage.setItem('gerak-last-workout', new Date().toISOString());
+				const history = json('gerak-history', []); history.push({ date: localDate(new Date()), workout: selected.title, minutes: selected.duration }); localStorage.setItem('gerak-history', JSON.stringify(history)); updateProgress();
 				title.textContent = 'Latihan selesai!'; exerciseName.textContent = 'Kerja bagus.'; status.textContent = 'Satu langkah lebih kuat dari kemarin.'; toggle.textContent = 'Tutup'; toggle.dataset.finished = 'true'; speak('Latihan selesai. Kerja bagus.');
 			};
 			const nextExercise = () => {
 				phase = 'work'; exerciseIndex++;
 				if (exerciseIndex >= selected.exercises.length) { exerciseIndex = 0; round++; }
 				if (round > selected.rounds) return finish();
-				seconds = workSeconds; phaseLabel.textContent = 'LATIHAN BERLANGSUNG'; exerciseName.textContent = selected.exercises[exerciseIndex]; showExerciseGuide(selected.exercises[exerciseIndex]); roundLabel.textContent = `Ronde ${round} / ${selected.rounds}`; status.textContent = 'Jaga napas. Kamu bisa.'; renderTimer(); speak(selected.exercises[exerciseIndex]);
+				seconds = workSeconds; lastSecond = -1; if (running) endAt = Date.now() + seconds * 1000; phaseLabel.textContent = 'LATIHAN BERLANGSUNG'; exerciseName.textContent = selected.exercises[exerciseIndex]; showExerciseGuide(selected.exercises[exerciseIndex]); roundLabel.textContent = `Ronde ${round} / ${selected.rounds}`; status.textContent = 'Jaga napas. Kamu bisa.'; renderTimer(); speak(selected.exercises[exerciseIndex]);
 			};
-			const rest = () => { phase = 'rest'; seconds = restSeconds; phaseLabel.textContent = 'ISTIRAHAT'; exerciseName.textContent = 'Tarik napas'; status.textContent = 'Siapkan gerakan berikutnya.'; renderTimer(); speak('Istirahat'); };
+			const rest = () => { phase = 'rest'; seconds = restSeconds; lastSecond = -1; if (running) endAt = Date.now() + seconds * 1000; phaseLabel.textContent = 'ISTIRAHAT'; exerciseName.textContent = 'Tarik napas'; status.textContent = 'Siapkan gerakan berikutnya.'; renderTimer(); speak('Istirahat'); };
+			const tick = () => {
+				seconds = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+				if (seconds !== lastSecond) { lastSecond = seconds; renderTimer(); if (seconds > 0 && seconds <= 3) beep(880, 0.08); }
+				if (seconds <= 0) { if (phase === 'work') rest(); else nextExercise(); }
+			};
 			const openWorkout = id => {
-				selected = workouts.find(item => item.id === id) || workouts[1]; clearInterval(interval); running = false; phase = 'work'; seconds = workSeconds; exerciseIndex = 0; round = 1;
+				selected = workouts.find(item => item.id === id) || workouts[1]; clearInterval(interval); running = false; releaseWakeLock(); phase = 'work'; seconds = workSeconds; lastSecond = -1; exerciseIndex = 0; round = 1;
 				title.textContent = selected.title; phaseLabel.textContent = 'LATIHAN BERLANGSUNG'; exerciseName.textContent = selected.exercises[0]; showExerciseGuide(selected.exercises[0]); roundLabel.textContent = `Ronde 1 / ${selected.rounds}`; status.textContent = 'Siap? Tekan mulai.'; toggle.textContent = 'Mulai'; delete toggle.dataset.finished; renderTimer(); modal.showModal();
 			};
 			const detailModal = document.querySelector('#detail-modal');
@@ -169,26 +181,25 @@ const exerciseGuide = {
 			toggle.addEventListener('click', () => {
 				if (toggle.dataset.finished) return modal.close();
 				running = !running; toggle.textContent = running ? 'Jeda' : 'Lanjut'; status.textContent = running ? 'Terus bergerak!' : 'Dijeda.'; clearInterval(interval);
-				if (running) interval = setInterval(() => { seconds--; renderTimer(); if (seconds <= 0) { if (phase === 'work') rest(); else nextExercise(); } }, 1000);
+				if (running) { beep(880, 0.08); endAt = Date.now() + seconds * 1000; requestWakeLock(); interval = setInterval(tick, 250); } else releaseWakeLock();
 			});
+			modal.addEventListener('close', () => { clearInterval(interval); running = false; releaseWakeLock(); speechSynthesis?.cancel(); });
+			document.addEventListener('keydown', event => { if (event.key === ' ' && modal.open) { event.preventDefault(); toggle.click(); } });
+			document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && running) { requestWakeLock(); tick(); } });
 			document.querySelectorAll('.filters button').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('.filters button').forEach(item => item.classList.remove('active')); button.classList.add('active'); document.querySelectorAll('.card').forEach(card => card.hidden = button.dataset.filter !== 'Semua' && card.dataset.level !== button.dataset.filter); }));
 			document.querySelector('#goal-select').addEventListener('change', event => { localStorage.setItem('gerak-goal', event.target.value); updateProgress(); });
 			document.querySelector('#export-progress').addEventListener('click', () => { const blob = new Blob([JSON.stringify(json('gerak-history', []), null, 2)], { type: 'application/json' }); const link = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'gerak-progress.json' }); link.click(); URL.revokeObjectURL(link.href); });
-			document.querySelector('#reset-progress').addEventListener('click', () => { localStorage.removeItem('gerak-progress'); localStorage.removeItem('gerak-history'); localStorage.removeItem('gerak-last-workout'); updateProgress(); });
+			document.querySelector('#reset-progress').addEventListener('click', () => { localStorage.removeItem(weekKey()); localStorage.removeItem('gerak-progress'); localStorage.removeItem('gerak-history'); localStorage.removeItem('gerak-last-workout'); updateProgress(); });
 			const share = async text => { if (navigator.share) await navigator.share({ title: 'GERAK', text, url: location.href }); else await navigator.clipboard?.writeText(`${text} ${location.href}`); };
 			document.querySelector('#share-site').addEventListener('click', () => share('Workout di rumah tanpa alat — GERAK'));
-			const onboarding = document.querySelector('#onboarding-modal');
-			document.querySelector('.close-onboarding').addEventListener('click', () => onboarding.close());
-			document.querySelector('#recommend').addEventListener('click', () => { const level = document.querySelector('#pref-level').value, focus = document.querySelector('#pref-focus').value, duration = Number(document.querySelector('#pref-duration').value); const match = workouts.find(item => item.level === level && item.focus === focus) || workouts.find(item => item.level === level && item.duration <= duration) || workouts[0]; onboarding.close(); document.querySelector(`[data-id="${match.id}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' }); showDetail(match.id); localStorage.setItem('gerak-preferences', JSON.stringify({ level, focus, duration })); });
-			if (!localStorage.getItem('gerak-preferences')) setTimeout(() => onboarding.showModal(), 800);
 			if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+			localStorage.removeItem('gerak-progress');
 			updateProgress();
 		</script>
 	</body>
 </html>
 
 <style is:global>
-	@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');
 	:root{--ink:#18201a;--cream:#f5f1e8;--lime:#c7f13c;--orange:#ff6b35;--line:#d4d0c5;--white:#fff}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:var(--cream);font-family:'DM Sans',sans-serif}button,a{font:inherit}button{color:inherit}a{color:inherit;text-decoration:none}.wrap{width:min(1180px,calc(100% - 40px));margin-inline:auto}.nav{height:82px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:10px;font:700 23px 'Space Grotesk';letter-spacing:-1px}.brand span{display:grid;place-items:center;width:34px;height:34px;border-radius:50% 50% 46% 54%;background:var(--ink);color:var(--lime);transform:rotate(-7deg);font-size:19px}nav{display:flex;gap:36px;font-weight:600;font-size:14px}nav a:hover{color:#52720d}.nav-cta{padding:12px 18px;border:1px solid var(--ink);border-radius:99px;font-weight:700;font-size:14px}
 	.hero{min-height:670px;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:40px;padding-block:70px 50px}.eyebrow{display:flex;align-items:center;gap:9px;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;font-weight:700}.eyebrow span{width:25px;height:2px;background:var(--orange)}h1,h2,h3,p{margin-top:0}h1,h2,h3{font-family:'Space Grotesk',sans-serif}h1{margin-bottom:24px;font-size:clamp(56px,7vw,91px);line-height:.92;letter-spacing:-5px}h1 em,.how h2 em{color:var(--orange);font-style:normal;position:relative}h1 em::after{content:'';position:absolute;height:7px;background:var(--orange);left:1%;right:-1%;bottom:-5px;border-radius:50%;transform:rotate(-1deg)}.lead{max-width:530px;color:#59605a;font-size:18px;line-height:1.65}.hero-actions{display:flex;flex-wrap:wrap;gap:13px;margin:33px 0}.button{min-height:52px;border-radius:99px;padding:0 24px;border:1px solid var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:11px;font-weight:700;cursor:pointer}.button.primary{background:var(--ink);color:white;box-shadow:4px 4px 0 var(--lime)}.button.primary:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 var(--lime)}.button.ghost{background:transparent}.play{display:grid;place-items:center;background:var(--orange);color:white;width:25px;height:25px;border-radius:50%;font-size:9px}.trust{display:flex;align-items:center;gap:15px;margin-top:40px;font-size:13px;color:#6c706c}.trust p{margin:0}.trust strong{color:var(--ink)}.faces{display:flex}.faces span{width:36px;height:36px;margin-left:-8px;display:grid;place-items:center;border:3px solid var(--cream);border-radius:50%;background:#f2a267;font-size:9px;font-weight:700}.faces span:first-child{margin:0;background:#8cc0da}.faces span:nth-child(3){background:#d98da5}.faces span:last-child{background:var(--lime)}
 	.hero-visual{height:540px;position:relative;overflow:hidden;background:#dff8a3;border-radius:48% 48% 9% 9%}.sun{position:absolute;width:180px;height:180px;background:#fff4bf;border-radius:50%;right:30px;top:28px}.figure{position:absolute;width:280px;height:390px;left:50%;top:88px;transform:translateX(-50%)}.head{position:absolute;width:82px;height:94px;border-radius:49% 51% 45% 48%;background:#8b512f;left:102px;top:0;z-index:4}.hair{position:absolute;width:86px;height:55px;border-radius:55% 55% 20% 20%;background:#171b17;left:98px;top:-5px;z-index:5}.hair::after{content:'';position:absolute;width:45px;height:45px;border-radius:50%;right:-29px;top:0;background:#171b17}.body{position:absolute;width:150px;height:180px;border-radius:44% 44% 20% 20%;background:#ff7040;left:65px;top:82px;z-index:3;clip-path:polygon(21% 0,79% 0,100% 100%,0 100%)}.arm{position:absolute;width:47px;height:205px;background:#8b512f;top:93px;border-radius:30px;z-index:2;transform-origin:top}.arm.left{left:72px;transform:rotate(58deg)}.arm.right{right:72px;transform:rotate(-58deg)}.arm::after{content:'';position:absolute;width:68px;height:24px;background:#8b512f;bottom:-4px;border-radius:20px}.arm.left::after{left:-42px}.arm.right::after{right:-42px}.leg{position:absolute;width:75px;height:210px;border-radius:26px;background:#292f2a;top:240px;z-index:2;transform-origin:top}.leg.left{left:78px;transform:rotate(25deg)}.leg.right{right:78px;transform:rotate(-25deg)}.stat{position:absolute;display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:13px 16px;z-index:8}.stat>span{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:var(--lime);font-size:20px}.stat strong{font:700 24px 'Space Grotesk';line-height:1}.stat small{display:block;font-size:8px;letter-spacing:1px;margin-top:3px}.stat-time{left:12px;top:48px;transform:rotate(-3deg)}.stat-place{right:5px;bottom:50px;transform:rotate(3deg)}.scribble{position:absolute;right:20px;top:210px;transform:rotate(-6deg);font-size:16px;line-height:1.2;font-style:italic}.scribble b{color:var(--orange)}
@@ -204,9 +215,6 @@ const exerciseGuide = {
 	#share-site{background:none;border:1px solid var(--ink);border-radius:99px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer}
 	.detail-box{background:#f8f9f6;border:1px solid var(--line);border-radius:14px;padding:14px;margin-block:12px;text-align:left}
 	.detail-box strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;color:var(--orange)}
-	#onboarding-modal label{display:block;text-align:left;margin-block:12px;font-weight:700;font-size:13px}
-	#onboarding-modal select{width:100%;margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit}
-	#recommend{margin-top:12px;width:100%}
 	.progress-stats{display:flex;justify-content:space-around;padding:18px 0;margin-top:18px;border-block:1px solid var(--line);font-size:12px}.progress-stats b{font-size:20px;color:var(--orange)}
 	.progress-controls{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:18px;flex-wrap:wrap}.progress-controls label,.interval-choice{font-size:11px;font-weight:700}.progress-controls select,.interval-choice select{padding:5px;border:1px solid var(--line);border-radius:7px;background:white}.progress-controls button{background:none;border:0;text-decoration:underline;color:#666;font-size:11px;cursor:pointer}.interval-choice{display:block;margin-top:12px}
 	@media(max-width:620px){.safety{align-items:flex-start;flex-direction:column}.card-actions{align-items:stretch}.footer-actions{flex-direction:column}}

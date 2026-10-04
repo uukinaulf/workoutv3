@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="GERAK — workout di rumah tanpa alat">
+	<rect width="1200" height="630" fill="#f5f1e8" />
+	<circle cx="1110" cy="112" r="132" fill="#dff8a3" />
+	<circle cx="1110" cy="112" r="80" fill="#fff4bf" />
+
+	<g transform="translate(80 74)">
+		<circle cx="30" cy="30" r="30" fill="#18201a" />
+		<text x="30" y="43" font-family="Verdana, DejaVu Sans, sans-serif" font-size="30" font-weight="bold" fill="#c7f13c" text-anchor="middle">G</text>
+		<text x="80" y="43" font-family="Verdana, DejaVu Sans, sans-serif" font-size="32" font-weight="bold" letter-spacing="-1" fill="#18201a">GERAK</text>
+	</g>
+
+	<rect x="80" y="188" width="46" height="6" rx="3" fill="#ff6b35" />
+	<text x="140" y="197" font-family="Verdana, DejaVu Sans, sans-serif" font-size="20" font-weight="bold" letter-spacing="3" fill="#18201a">WORKOUT DI RUMAH</text>
+
+	<text x="78" y="330" font-family="Verdana, DejaVu Sans, sans-serif" font-size="86" font-weight="bold" letter-spacing="-3" fill="#18201a">Badan lebih kuat.</text>
+	<text x="78" y="424" font-family="Verdana, DejaVu Sans, sans-serif" font-size="86" font-weight="bold" letter-spacing="-3" fill="#ff6b35">Dari rumah.</text>
+	<rect x="80" y="446" width="360" height="10" rx="5" fill="#ff6b35" transform="rotate(-1 80 446)" />
+
+	<text x="80" y="522" font-family="Verdana, DejaVu Sans, sans-serif" font-size="24" fill="#59605a">Tanpa alat. Tanpa biaya. Timer dan progres otomatis.</text>
+
+	<g font-family="Verdana, DejaVu Sans, sans-serif">
+		<rect x="80" y="556" width="290" height="52" rx="26" fill="#18201a" />
+		<text x="225" y="589" font-size="20" font-weight="bold" fill="#ffffff" text-anchor="middle">gerak.pages.dev</text>
+	</g>
+
+	<g transform="translate(820 330)">
+		<rect x="-24" y="0" width="330" height="112" rx="18" fill="#ffffff" stroke="#18201a" stroke-width="3" />
+		<text x="10" y="42" font-family="Verdana, DejaVu Sans, sans-serif" font-size="19" font-weight="bold" fill="#18201a">6 PROGRAM</text>
+		<text x="10" y="80" font-family="Verdana, DejaVu Sans, sans-serif" font-size="19" font-weight="bold" fill="#18201a">24 GERAKAN</text>
+		<circle cx="272" cy="56" r="26" fill="#c7f13c" stroke="#18201a" stroke-width="3" />
+		<text x="272" y="66" font-family="Verdana, DejaVu Sans, sans-serif" font-size="24" font-weight="bold" fill="#18201a" text-anchor="middle">✓</text>
+	</g>
+</svg>

@@ -16,7 +16,7 @@ npm run dev
 | `npm run preview` | Preview hasil build |
 | `npm run check` | Type check (`astro check`) |
 | `npm test` | Unit test (`node --test tests/`) |
-| `npm run og` | Regenerasi `public/og.png` dari `public/og.svg` (butuh `rsvg-convert`) |
+| `npm run og` | Regenerasi `public/og.png` dari `src/assets/og.svg` (butuh `rsvg-convert`) |
 
 `npm test` memakai TypeScript type stripping bawaan Node, jadi butuh Node >= 22.18.
 
@@ -26,12 +26,13 @@ npm run dev
 src/data/workouts.ts     # 6 program + 24 panduan gerakan (durasi diturunkan dari ronde x interval)
 src/lib/progress.ts      # logika murni: weekKey, streak, progres, sanitasi/merge riwayat
 src/lib/timer.ts         # logika murni: advance, isFinalSet, estimateMinutes, interval
+src/lib/storage.ts       # pembungkus localStorage yang tidak pernah throw
 src/pages/index.astro    # halaman + client script + CSS
 src/pages/sitemap.xml.ts # route sitemap
 src/pages/robots.txt.ts  # route robots
 public/sw.js             # service worker (precache + network-first untuk navigasi)
 public/manifest.webmanifest
-public/og.svg            # sumber kartu sosial 1200x630
+src/assets/og.svg        # sumber kartu sosial 1200x630 (tidak dikirim ke dist)
 tests/                   # node:test: data, progres, timer, dan simulasi sesi
 ```
 
@@ -56,4 +57,5 @@ Data program di-embed ke halaman sebagai `<script type="application/json" id="ge
 - Export dan import JSON, reset dengan konfirmasi, Web Share
 - Lanjutkan program terakhir dari tombol latihan cepat
 - Catatan keselamatan, metadata SEO (canonical, Open Graph, JSON-LD), dan PWA offline
-- Mode gelap mengikuti `prefers-color-scheme`, navigasi sticky
+- Mode gelap mengikuti `prefers-color-scheme` (`color-scheme` ikut diset agar kontrol form bawaan gelap), navigasi sticky
+- Tulis `localStorage` dibungkus `src/lib/storage.ts`: mode privat atau kuota penuh tidak lagi menggagalkan sesi yang sudah selesai

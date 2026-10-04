@@ -16,9 +16,9 @@ npm test        # node:test
 npm run build
 ```
 
-`public/og.png` is generated from `public/og.svg` with `npm run og` (requires `rsvg-convert`); regenerate it when the social card changes.
+`public/og.png` is generated from `src/assets/og.svg` with `npm run og` (requires `rsvg-convert`); regenerate it when the social card changes. `src/assets/` is not copied to `dist/`.
 
-Workout programs and exercise guides live in `src/data/workouts.ts`; `duration` there is derived from `rounds` and the default interval, so never hardcode it. Pure logic lives in `src/lib/progress.ts` and `src/lib/timer.ts` and is covered by `tests/`, including a simulated full session.
+Workout programs and exercise guides live in `src/data/workouts.ts`; `duration` there is derived from `rounds` and the default interval, so never hardcode it. Pure logic lives in `src/lib/progress.ts`, `src/lib/timer.ts`, and `src/lib/storage.ts` and is covered by `tests/`, including a simulated full session. All `localStorage` access goes through `createStore()` so private mode or a full quota cannot throw mid-session.
 
 ## Documentation
 

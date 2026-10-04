@@ -20,6 +20,7 @@ const intervalOptions = INTERVAL_OPTIONS;
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
+		<meta name="color-scheme" content="light dark" />
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonical} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -28,6 +29,7 @@ const intervalOptions = INTERVAL_OPTIONS;
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="manifest" href="/manifest.webmanifest" />
 		<meta name="theme-color" content="#18201a" />
+		<meta name="theme-color" content="#141810" media="(prefers-color-scheme: dark)" />
 		<meta property="og:title" content="GERAK — Workout di Rumah" />
 		<meta property="og:description" content={shareText} />
 		<meta property="og:type" content="website" />
@@ -114,6 +116,7 @@ const intervalOptions = INTERVAL_OPTIONS;
 				DEFAULT_REST, DEFAULT_WORK, READY_SECONDS, type Phase,
 			} from '../lib/timer';
 			import type { ExerciseGuide, Workout } from '../data/workouts';
+			import { createStore } from '../lib/storage';
 
 			interface GerakData {
 				workouts: Workout[];
@@ -158,6 +161,12 @@ const intervalOptions = INTERVAL_OPTIONS;
 			const importFile = select<HTMLInputElement>('#import-file');
 			const dayCells = document.querySelectorAll<HTMLDivElement>('.days div');
 
+			const store = createStore(window.localStorage, () => {
+				historyStatus.textContent = 'Penyimpanan browser tidak tersedia; progres hanya bertahan selama halaman ini terbuka.';
+			});
+			const json = <T,>(key: string, fallback: T): T => store.get<T>(key, fallback);
+			const remove = (key: string) => store.remove(key);
+
 			let selected: Workout = workouts[0];
 			let interval: ReturnType<typeof setInterval> | undefined;
 			let phase: Phase = 'work';
@@ -171,18 +180,9 @@ const intervalOptions = INTERVAL_OPTIONS;
 			let endAt = 0;
 			let lastSecond = -1;
 			let elapsedSeconds = 0;
-			let muted = localStorage.getItem(MUTE_KEY) === 'true';
+			let muted = store.get<boolean>(MUTE_KEY, false);
 			let wakeLock: WakeLockSentinel | null = null;
 			let audioCtx: AudioContext | undefined;
-
-			const json = <T,>(key: string, fallback: T): T => {
-				try {
-					const raw = localStorage.getItem(key);
-					return raw ? (JSON.parse(raw) as T) : fallback;
-				} catch {
-					return fallback;
-				}
-			};
 
 			const readHistory = (): HistoryEntry[] => sanitizeHistory(json<unknown>(HISTORY_KEY, []));
 
@@ -204,7 +204,9 @@ const intervalOptions = INTERVAL_OPTIONS;
 			const speak = (text: string) => {
 				if (muted || !('speechSynthesis' in window)) return;
 				speechSynthesis.cancel();
-				speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+				const utterance = new SpeechSynthesisUtterance(text);
+				utterance.lang = 'id-ID';
+				speechSynthesis.speak(utterance);
 			};
 
 			const requestWakeLock = async () => {
@@ -248,7 +250,7 @@ const intervalOptions = INTERVAL_OPTIONS;
 				const today = new Date();
 				const completed = json<number[]>(weekKey(today), []);
 				const history = readHistory();
-				const goal = Number(localStorage.getItem(GOAL_KEY) ?? DEFAULT_GOAL);
+				const goal = store.get<number>(GOAL_KEY, DEFAULT_GOAL);
 				completedCount.textContent = String(completed.length);
 				weeklyGoal.textContent = String(goal);
 				goalSelect.value = String(goal);
@@ -280,12 +282,12 @@ const intervalOptions = INTERVAL_OPTIONS;
 				const completed = json<number[]>(weekKey(now), []);
 				const todayIndex = dayIndex(now);
 				if (!completed.includes(todayIndex)) completed.push(todayIndex);
-				localStorage.setItem(weekKey(now), JSON.stringify(completed));
-				localStorage.setItem(LAST_WORKOUT_KEY, now.toISOString());
-				localStorage.setItem(LAST_PROGRAM_KEY, selected.id);
+				store.set(weekKey(now), JSON.stringify(completed));
+				store.set(LAST_WORKOUT_KEY, now.toISOString());
+				store.set(LAST_PROGRAM_KEY, selected.id);
 				const history = readHistory();
 				history.push({ date: localDate(now), workout: selected.title, minutes });
-				localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+				store.set(HISTORY_KEY, JSON.stringify(history));
 				updateProgress();
 			};
 
@@ -481,7 +483,7 @@ const intervalOptions = INTERVAL_OPTIONS;
 			});
 			muteToggle.addEventListener('click', () => {
 				muted = !muted;
-				localStorage.setItem(MUTE_KEY, String(muted));
+				store.set(MUTE_KEY, String(muted));
 				if (muted) speechSynthesis?.cancel();
 				renderMute();
 			});
@@ -521,11 +523,11 @@ const intervalOptions = INTERVAL_OPTIONS;
 				});
 			});
 			goalSelect.addEventListener('change', () => {
-				localStorage.setItem(GOAL_KEY, goalSelect.value);
+				store.set(GOAL_KEY, goalSelect.value);
 				updateProgress();
 			});
 			select<HTMLButtonElement>('#export-progress').addEventListener('click', () => {
-				const payload = { goal: Number(localStorage.getItem(GOAL_KEY) ?? DEFAULT_GOAL), history: readHistory() };
+				const payload = { goal: store.get<number>(GOAL_KEY, DEFAULT_GOAL), history: readHistory() };
 				const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
 				const link = document.createElement('a');
 				link.href = URL.createObjectURL(blob);
@@ -542,7 +544,7 @@ const intervalOptions = INTERVAL_OPTIONS;
 					const incoming = sanitizeHistory(Array.isArray(parsed) ? parsed : (parsed as { history?: unknown }).history);
 					if (incoming.length === 0) { historyStatus.textContent = 'Tidak ada data latihan yang bisa dibaca.'; return; }
 					const merged = mergeHistory(readHistory(), incoming);
-					localStorage.setItem(HISTORY_KEY, JSON.stringify(merged));
+					store.set(HISTORY_KEY, JSON.stringify(merged));
 					updateProgress();
 					historyStatus.textContent = `${incoming.length} latihan diimpor.`;
 				} catch {
@@ -553,17 +555,17 @@ const intervalOptions = INTERVAL_OPTIONS;
 			});
 			select<HTMLButtonElement>('#reset-progress').addEventListener('click', () => {
 				if (!confirm('Hapus semua progres latihan di perangkat ini? Tindakan ini tidak bisa dibatalkan.')) return;
-				localStorage.removeItem(weekKey(new Date()));
-				localStorage.removeItem(HISTORY_KEY);
-				localStorage.removeItem(LAST_WORKOUT_KEY);
-				localStorage.removeItem(LAST_PROGRAM_KEY);
+				remove(weekKey(new Date()));
+				remove(HISTORY_KEY);
+				remove(LAST_WORKOUT_KEY);
+				remove(LAST_PROGRAM_KEY);
 				historyStatus.textContent = 'Progres dihapus.';
 				updateProgress();
 			});
 			select<HTMLButtonElement>('#share-site').addEventListener('click', () => { void share('Workout di rumah tanpa alat — GERAK'); });
 			if ('serviceWorker' in navigator) void navigator.serviceWorker.register('/sw.js').catch(() => {});
 
-			const lastProgram = workouts.find(workout => workout.id === localStorage.getItem(LAST_PROGRAM_KEY));
+			const lastProgram = workouts.find(workout => workout.id === store.get<string | null>(LAST_PROGRAM_KEY, null));
 			if (lastProgram) { selected = lastProgram; quickStartLabel.textContent = `Lanjutkan ${lastProgram.title}`; }
 			else quickStartLabel.textContent = `Latihan cepat ${workouts[0].duration} menit`;
 			renderMute();
@@ -573,7 +575,7 @@ const intervalOptions = INTERVAL_OPTIONS;
 </html>
 
 <style is:global>
-	:root{--ink:#18201a;--cream:#f5f1e8;--lime:#c7f13c;--orange:#ff6b35;--line:#d4d0c5;--white:#fff}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:var(--cream);font-family:'DM Sans',sans-serif}button,a{font:inherit}button{color:inherit}a{color:inherit;text-decoration:none}.wrap{width:min(1180px,calc(100% - 40px));margin-inline:auto}.nav{height:82px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:10px;font:700 23px 'Space Grotesk';letter-spacing:-1px}.brand span{display:grid;place-items:center;width:34px;height:34px;border-radius:50% 50% 46% 54%;background:var(--ink);color:var(--lime);transform:rotate(-7deg);font-size:19px}nav{display:flex;gap:36px;font-weight:600;font-size:14px}nav a:hover{color:#52720d}.nav-cta{padding:12px 18px;border:1px solid var(--ink);border-radius:99px;font-weight:700;font-size:14px}
+	:root{--ink:#18201a;--cream:#f5f1e8;--lime:#c7f13c;--orange:#ff6b35;--line:#d4d0c5;--white:#fff;color-scheme:light dark}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:var(--cream);font-family:'DM Sans',sans-serif}button,a{font:inherit}button{color:inherit}a{color:inherit;text-decoration:none}.wrap{width:min(1180px,calc(100% - 40px));margin-inline:auto}.nav{height:82px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:10px;font:700 23px 'Space Grotesk';letter-spacing:-1px}.brand span{display:grid;place-items:center;width:34px;height:34px;border-radius:50% 50% 46% 54%;background:var(--ink);color:var(--lime);transform:rotate(-7deg);font-size:19px}nav{display:flex;gap:36px;font-weight:600;font-size:14px}nav a:hover{color:#52720d}.nav-cta{padding:12px 18px;border:1px solid var(--ink);border-radius:99px;font-weight:700;font-size:14px}
 	.hero{min-height:670px;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:40px;padding-block:70px 50px}.eyebrow{display:flex;align-items:center;gap:9px;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;font-weight:700}.eyebrow span{width:25px;height:2px;background:var(--orange)}h1,h2,h3,p{margin-top:0}h1,h2,h3{font-family:'Space Grotesk',sans-serif}h1{margin-bottom:24px;font-size:clamp(56px,7vw,91px);line-height:.92;letter-spacing:-5px}h1 em,.how h2 em{color:var(--orange);font-style:normal;position:relative}h1 em::after{content:'';position:absolute;height:7px;background:var(--orange);left:1%;right:-1%;bottom:-5px;border-radius:50%;transform:rotate(-1deg)}.lead{max-width:530px;color:#59605a;font-size:18px;line-height:1.65}.hero-actions{display:flex;flex-wrap:wrap;gap:13px;margin:33px 0}.button{min-height:52px;border-radius:99px;padding:0 24px;border:1px solid var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:11px;font-weight:700;cursor:pointer}.button.primary{background:var(--ink);color:white;box-shadow:4px 4px 0 var(--lime)}.button.primary:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 var(--lime)}.button.ghost{background:transparent}.play{display:grid;place-items:center;background:var(--orange);color:white;width:25px;height:25px;border-radius:50%;font-size:9px}.trust{display:flex;align-items:center;gap:15px;margin-top:40px;font-size:13px;color:#6c706c}.trust p{margin:0}.trust strong{color:var(--ink)}.faces{display:flex}.faces span{width:36px;height:36px;margin-left:-8px;display:grid;place-items:center;border:3px solid var(--cream);border-radius:50%;background:#f2a267;font-size:9px;font-weight:700}.faces span:first-child{margin:0;background:#8cc0da}.faces span:nth-child(3){background:#d98da5}.faces span:last-child{background:var(--lime)}
 	.hero-visual{height:540px;position:relative;overflow:hidden;background:#dff8a3;border-radius:48% 48% 9% 9%}.sun{position:absolute;width:180px;height:180px;background:#fff4bf;border-radius:50%;right:30px;top:28px}.figure{position:absolute;width:280px;height:390px;left:50%;top:88px;transform:translateX(-50%)}.head{position:absolute;width:82px;height:94px;border-radius:49% 51% 45% 48%;background:#8b512f;left:102px;top:0;z-index:4}.hair{position:absolute;width:86px;height:55px;border-radius:55% 55% 20% 20%;background:#171b17;left:98px;top:-5px;z-index:5}.hair::after{content:'';position:absolute;width:45px;height:45px;border-radius:50%;right:-29px;top:0;background:#171b17}.body{position:absolute;width:150px;height:180px;border-radius:44% 44% 20% 20%;background:#ff7040;left:65px;top:82px;z-index:3;clip-path:polygon(21% 0,79% 0,100% 100%,0 100%)}.arm{position:absolute;width:47px;height:205px;background:#8b512f;top:93px;border-radius:30px;z-index:2;transform-origin:top}.arm.left{left:72px;transform:rotate(58deg)}.arm.right{right:72px;transform:rotate(-58deg)}.arm::after{content:'';position:absolute;width:68px;height:24px;background:#8b512f;bottom:-4px;border-radius:20px}.arm.left::after{left:-42px}.arm.right::after{right:-42px}.leg{position:absolute;width:75px;height:210px;border-radius:26px;background:#292f2a;top:240px;z-index:2;transform-origin:top}.leg.left{left:78px;transform:rotate(25deg)}.leg.right{right:78px;transform:rotate(-25deg)}.stat{position:absolute;display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:13px 16px;z-index:8}.stat>span{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:var(--lime);font-size:20px}.stat strong{font:700 24px 'Space Grotesk';line-height:1}.stat small{display:block;font-size:8px;letter-spacing:1px;margin-top:3px}.stat-time{left:12px;top:48px;transform:rotate(-3deg)}.stat-place{right:5px;bottom:50px;transform:rotate(3deg)}.scribble{position:absolute;right:20px;top:210px;transform:rotate(-6deg);font-size:16px;line-height:1.2;font-style:italic}.scribble b{color:var(--orange)}
 	.ticker{overflow:hidden;white-space:nowrap;padding:16px;background:var(--ink);color:#fff;font:700 14px 'Space Grotesk';letter-spacing:1.5px;transform:rotate(-1deg);width:101%;margin-left:-.5%}.ticker b{color:var(--lime);padding:0 28px}.programs{padding-block:120px}.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:50px;margin-bottom:45px}.section-head h2,.progress h2{font-size:clamp(40px,5vw,62px);line-height:.95;letter-spacing:-3px;margin:0}.section-head>p{width:380px;color:#646b65;line-height:1.6;margin:0}.filters{display:flex;gap:8px;margin-bottom:24px;overflow:auto;padding-bottom:4px}.filters button{border:1px solid var(--line);background:transparent;padding:9px 18px;border-radius:99px;cursor:pointer;white-space:nowrap}.filters button.active{color:white;background:var(--ink);border-color:var(--ink)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.card{min-height:430px;display:flex;flex-direction:column;border:1px solid var(--ink);border-radius:18px;overflow:hidden;position:relative;transition:.2s}.card:hover{transform:translateY(-5px);box-shadow:6px 7px 0 var(--ink)}.card[hidden]{display:none}.card.lime{background:#dff58f}.card.orange{background:#ffcba9}.card.blue{background:#b9dcf2}.card.pink{background:#f2bfd0}.card.purple{background:#d9ccf2}.card.yellow{background:#f8e989}.card-top{display:flex;justify-content:space-between;padding:18px}.number{font:700 14px 'Space Grotesk'}.tag{background:rgba(255,255,255,.72);padding:7px 11px;border-radius:99px;font-size:11px;font-weight:700}.mini-figure{height:160px;position:relative;margin:auto;width:150px}.mini-figure span{position:absolute;width:42px;height:42px;border-radius:50%;background:var(--ink);left:54px;top:5px}.mini-figure i{position:absolute;width:72px;height:90px;background:var(--orange);left:39px;top:43px;border-radius:35px 35px 10px 10px}.mini-figure b{position:absolute;width:135px;height:25px;background:var(--ink);left:7px;top:70px;border-radius:20px;transform:rotate(-8deg)}.card:nth-child(even) .mini-figure b{transform:rotate(22deg)}.card-body{margin-top:auto;padding:24px;background:#fff;border-top:1px solid var(--ink)}.card-body p{margin-bottom:4px;color:#787d78;text-transform:uppercase;letter-spacing:1.2px;font-size:10px;font-weight:700}.card-body h3{font-size:23px;margin-bottom:15px}.meta{display:flex;gap:15px;font-size:12px;color:#646964;margin-bottom:20px}.start-workout{border:0;border-top:1px solid var(--line);padding:15px 0 0;width:100%;display:flex;justify-content:space-between;background:none;font-weight:700;cursor:pointer}.start-workout span{font-size:20px}

@@ -11,7 +11,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "node --test tests/",
-    "og": "rsvg-convert -w 1200 -h 630 public/og.svg -o public/og.png",
+    "og": "rsvg-convert -w 1200 -h 630 src/assets/og.svg -o public/og.png",
     "astro": "astro"
   },
   "dependencies": {

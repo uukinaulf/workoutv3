@@ -1,8 +1,9 @@
-const CACHE_NAME = 'gerak-cache-v2';
+const CACHE_NAME = 'gerak-cache-v3';
 const ASSETS = [
   '/',
   '/favicon.svg',
-  '/manifest.webmanifest'
+  '/manifest.webmanifest',
+  '/og.png'
 ];
 
 self.addEventListener('install', event => {

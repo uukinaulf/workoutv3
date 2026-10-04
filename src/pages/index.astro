@@ -1,38 +1,18 @@
 ---
-const workouts = [
-	{ id: 'full-body', title: 'Full Body Starter', level: 'Pemula', duration: 15, focus: 'Seluruh tubuh', color: 'lime', exercises: ['Jumping Jack', 'Bodyweight Squat', 'Incline Push-up', 'Glute Bridge'], rounds: 3, target: 'Seluruh tubuh', tip: 'Jaga ritme napas dan mendarat lembut.', easier: 'Step jack tanpa lompatan.' },
-	{ id: 'core', title: 'Core Foundation', level: 'Pemula', duration: 10, focus: 'Core', color: 'orange', exercises: ['Dead Bug', 'Bird Dog', 'Plank', 'Mountain Climber'], rounds: 2, target: 'Perut dan punggung', tip: 'Tekan punggung bawah ke lantai saat core bergerak.', easier: 'Kurangi durasi plank menjadi 15 detik.' },
-	{ id: 'strength', title: 'Strength Builder', level: 'Menengah', duration: 25, focus: 'Kekuatan', color: 'blue', exercises: ['Tempo Squat', 'Push-up', 'Reverse Lunge', 'Pike Push-up'], rounds: 4, target: 'Kaki, dada, bahu', tip: 'Turun perlahan, dorong lantai dengan stabil.', easier: 'Gunakan lutut untuk push-up.' },
-	{ id: 'hiit', title: 'Quick HIIT Burn', level: 'Menengah', duration: 20, focus: 'Kardio', color: 'pink', exercises: ['High Knees', 'Squat Thrust', 'Skater Jump', 'Plank Jack'], rounds: 4, target: 'Jantung dan seluruh tubuh', tip: 'Pertahankan intensitas, tapi tetap bisa bicara pendek.', easier: 'Ganti lompatan dengan langkah cepat.' },
-	{ id: 'mobility', title: 'Morning Mobility', level: 'Semua level', duration: 8, focus: 'Mobilitas', color: 'purple', exercises: ['Cat Cow', 'World’s Greatest Stretch', 'Hip Opener', 'Child’s Pose'], rounds: 2, target: 'Pinggul dan tulang belakang', tip: 'Bergerak dalam rentang nyaman, tanpa memaksa.', easier: 'Tahan setiap posisi lebih singkat.' },
-	{ id: 'lower', title: 'Lower Body Power', level: 'Lanjutan', duration: 30, focus: 'Kaki', color: 'yellow', exercises: ['Jump Squat', 'Bulgarian Split Squat', 'Single-leg Bridge', 'Calf Raise'], rounds: 4, target: 'Glutes dan kaki', tip: 'Dorong dari telapak kaki dan jaga lutut searah jari.', easier: 'Hapus lompatan dan gunakan squat biasa.' },
-];
-const exerciseGuide = {
-	'Jumping Jack': { target: 'Kardio seluruh tubuh', steps: 'Berdiri tegak, kaki rapat. Lompat buka kaki sambil angkat tangan, lalu kembali rapat.', breath: 'Buang napas saat membuka kaki.', avoid: 'Jangan mendarat dengan lutut terkunci.', easier: 'Lakukan step jack tanpa lompatan.' },
-	'Bodyweight Squat': { target: 'Paha dan glutes', steps: 'Kaki selebar bahu. Dorong pinggul ke belakang, tekuk lutut, lalu berdiri dengan mendorong lantai.', breath: 'Tarik napas turun, buang napas naik.', avoid: 'Lutut jangan jatuh ke dalam.', easier: 'Turun ke kursi sebagai sasaran.' },
-	'Incline Push-up': { target: 'Dada, bahu, trisep', steps: 'Tangan di tepi meja atau dinding. Tubuh lurus, tekuk siku mendekat ke badan, dorong kembali.', breath: 'Tarik napas turun, buang napas mendorong.', avoid: 'Jangan biarkan pinggul turun.', easier: 'Gunakan dinding dengan posisi lebih tegak.' },
-	'Glute Bridge': { target: 'Glutes dan hamstring', steps: 'Berbaring, lutut ditekuk. Tekan tumit, angkat pinggul sampai badan membentuk garis lurus, lalu turunkan.', breath: 'Buang napas saat mengangkat pinggul.', avoid: 'Jangan melengkungkan pinggang berlebihan.', easier: 'Angkat pinggul dengan jarak lebih pendek.' },
-	'Dead Bug': { target: 'Core dan kontrol tubuh', steps: 'Berbaring, tangan ke atas, lutut 90 derajat. Turunkan tangan dan kaki berlawanan tanpa mengangkat pinggang.', breath: 'Buang napas saat tangan dan kaki menjauh.', avoid: 'Pinggang tetap menempel lantai.', easier: 'Gerakkan satu anggota tubuh saja.' },
-	'Bird Dog': { target: 'Core dan punggung', steps: 'Posisi merangkak. Rentangkan tangan kanan dan kaki kiri, tahan, kembali, lalu ganti sisi.', breath: 'Bernapas stabil selama menahan posisi.', avoid: 'Jangan memutar pinggul.', easier: 'Angkat tangan atau kaki saja.' },
-	'Plank': { target: 'Core, bahu, glutes', steps: 'Siku tepat di bawah bahu. Luruskan badan dari kepala sampai tumit dan kencangkan perut.', breath: 'Bernapas pendek dan stabil.', avoid: 'Jangan tahan napas atau biarkan pinggang turun.', easier: 'Turunkan lutut ke lantai.' },
-	'Mountain Climber': { target: 'Core dan kardio', steps: 'Mulai dari posisi plank. Tarik satu lutut ke dada, kembalikan, lalu ganti sisi secara bergantian.', breath: 'Buang napas setiap lutut maju.', avoid: 'Bahu tetap di atas pergelangan tangan.', easier: 'Langkahkan kaki pelan, tanpa lompatan.' },
-	'Tempo Squat': { target: 'Kaki dan kontrol gerak', steps: 'Lakukan squat, turunkan badan selama tiga hitungan, tahan sebentar, lalu berdiri.', breath: 'Tarik napas turun, buang napas naik.', avoid: 'Jangan jatuh bebas saat turun.', easier: 'Gunakan tempo normal.' },
-	'Push-up': { target: 'Dada, bahu, trisep', steps: 'Tangan sedikit lebih lebar dari bahu. Turunkan dada mendekati lantai dengan badan lurus, lalu dorong.', breath: 'Tarik napas turun, buang napas naik.', avoid: 'Siku jangan melebar 90 derajat.', easier: 'Lakukan dari lutut.' },
-	'Reverse Lunge': { target: 'Glutes dan paha', steps: 'Langkahkan satu kaki ke belakang, turunkan lutut ke arah lantai, lalu dorong kaki depan untuk kembali.', breath: 'Tarik napas turun, buang napas naik.', avoid: 'Lutut depan tetap searah jari kaki.', easier: 'Pegang dinding untuk keseimbangan.' },
-	'Pike Push-up': { target: 'Bahu dan trisep', steps: 'Bentuk huruf V terbalik. Tekuk siku, arahkan kepala ke lantai di antara tangan, lalu dorong.', breath: 'Tarik napas turun, buang napas mendorong.', avoid: 'Jangan menekuk punggung terlalu rata.', easier: 'Kurangi kedalaman gerak.' },
-	'High Knees': { target: 'Kardio dan pinggul', steps: 'Berdiri tegak, angkat lutut bergantian setinggi pinggul sambil mengayun tangan.', breath: 'Bernapas ritmis dan teratur.', avoid: 'Jangan condong terlalu jauh ke belakang.', easier: 'Lakukan marching tanpa lompatan.' },
-	'Squat Thrust': { target: 'Kardio seluruh tubuh', steps: 'Dari berdiri, jongkok dan letakkan tangan, langkahkan kaki ke belakang, kembali ke jongkok, lalu berdiri.', breath: 'Buang napas saat kembali berdiri.', avoid: 'Jaga bahu tidak menjauh dari tangan.', easier: 'Langkahkan kaki satu per satu.' },
-	'Skater Jump': { target: 'Glutes dan koordinasi', steps: 'Lompat menyamping dari satu kaki ke kaki lain, ayunkan kaki belakang di belakang tubuh.', breath: 'Buang napas saat mendarat.', avoid: 'Mendarat lembut dengan lutut sedikit menekuk.', easier: 'Lakukan langkah menyamping tanpa lompat.' },
-	'Plank Jack': { target: 'Core dan kardio', steps: 'Dari plank, lompat buka-tutup kaki seperti jumping jack sambil menjaga badan stabil.', breath: 'Bernapas stabil, buang napas saat kaki membuka.', avoid: 'Jangan biarkan pinggul bergoyang.', easier: 'Tap kaki keluar satu per satu.' },
-	'Cat Cow': { target: 'Mobilitas tulang belakang', steps: 'Dari merangkak, lengkungkan punggung sambil menunduk, lalu turunkan perut dan buka dada perlahan.', breath: 'Buang napas saat membulat, tarik napas saat membuka dada.', avoid: 'Gerak perlahan, bukan dipaksa.', easier: 'Kurangi rentang gerak.' },
-	'World’s Greatest Stretch': { target: 'Pinggul, paha, punggung', steps: 'Dari posisi lunge, letakkan tangan di dalam kaki depan dan putar tangan satunya ke langit-langit.', breath: 'Tarik napas saat membuka dada.', avoid: 'Tumit kaki belakang boleh terangkat.', easier: 'Letakkan lutut belakang di lantai.' },
-	'Hip Opener': { target: 'Pinggul dan paha dalam', steps: 'Dari posisi merangkak, buka satu lutut ke samping tanpa memutar badan, lalu kembali.', breath: 'Bernapas perlahan sepanjang gerak.', avoid: 'Jaga bahu tetap sejajar.', easier: 'Buka lutut dengan jarak kecil.' },
-	'Child’s Pose': { target: 'Punggung dan pinggul', steps: 'Duduk ke arah tumit, rentangkan tangan ke depan, dan biarkan dahi mendekati lantai.', breath: 'Tarik napas panjang dan rileks.', avoid: 'Jangan memaksa tumit atau bahu.', easier: 'Buka lutut lebih lebar.' },
-	'Jump Squat': { target: 'Glutes dan daya ledak kaki', steps: 'Turun ke squat, dorong lantai untuk melompat, lalu mendarat lembut dan langsung kontrol turun.', breath: 'Buang napas saat melompat.', avoid: 'Lutut mengikuti arah jari kaki.', easier: 'Hapus lompatan.' },
-	'Bulgarian Split Squat': { target: 'Kaki dan keseimbangan', steps: 'Letakkan punggung kaki di permukaan rendah, turunkan pinggul lurus ke bawah, lalu dorong kaki depan.', breath: 'Tarik napas turun, buang napas naik.', avoid: 'Jangan menumpu berat pada kaki belakang.', easier: 'Gunakan posisi split squat biasa.' },
-	'Single-leg Bridge': { target: 'Glutes dan hamstring', steps: 'Berbaring, satu kaki menapak dan satu kaki terangkat. Angkat pinggul dengan kaki yang menapak, lalu turunkan.', breath: 'Buang napas saat mengangkat.', avoid: 'Pinggul tetap sejajar kiri dan kanan.', easier: 'Gunakan kedua kaki.' },
-	'Calf Raise': { target: 'Betis dan pergelangan kaki', steps: 'Berdiri tegak, angkat tumit setinggi mungkin, tahan sebentar, lalu turunkan perlahan.', breath: 'Buang napas saat mengangkat tumit.', avoid: 'Jangan bergoyang ke luar.', easier: 'Pegang dinding untuk keseimbangan.' },
-};
+import { workouts, exerciseGuide } from '../data/workouts';
+import { DAY_LABELS, DEFAULT_GOAL } from '../lib/progress';
+import { DEFAULT_REST, DEFAULT_WORK, INTERVAL_OPTIONS } from '../lib/timer';
+
+const site = Astro.site ?? new URL('https://gerak.pages.dev');
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL('/og.png', site).href;
+const description = 'Program workout di rumah tanpa alat. Pilih latihan, nyalakan timer, dan pantau progresmu.';
+const shareText = 'Workout rumahan tanpa alat, lengkap dengan timer dan progres.';
+const durations = workouts.map(workout => workout.duration);
+const durationRange = `${Math.min(...durations)}–${Math.max(...durations)}`;
+const exerciseCount = Object.keys(exerciseGuide).length;
+const dayLabels = DAY_LABELS;
+const intervalOptions = INTERVAL_OPTIONS;
 ---
 
 <!doctype html>
@@ -40,7 +20,8 @@ const exerciseGuide = {
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<meta name="description" content="Program workout di rumah tanpa alat. Pilih latihan, nyalakan timer, dan pantau progresmu." />
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" />
@@ -48,10 +29,20 @@ const exerciseGuide = {
 		<link rel="manifest" href="/manifest.webmanifest" />
 		<meta name="theme-color" content="#18201a" />
 		<meta property="og:title" content="GERAK — Workout di Rumah" />
-		<meta property="og:description" content="Workout rumahan tanpa alat, lengkap dengan timer dan progres." />
+		<meta property="og:description" content={shareText} />
 		<meta property="og:type" content="website" />
-		<meta property="og:image" content="https://gerak.pages.dev/favicon.svg" />
-		<meta name="twitter:card" content="summary" />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:site_name" content="GERAK" />
+		<meta property="og:locale" content="id_ID" />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:type" content="image/png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content="GERAK — workout di rumah tanpa alat" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="GERAK — Workout di Rumah" />
+		<meta name="twitter:description" content={shareText} />
+		<meta name="twitter:image" content={ogImage} />
 		<meta name="generator" content={Astro.generator} />
 		<title>GERAK — Workout di Rumah</title>
 		<script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'GERAK', description: 'Program workout di rumah tanpa alat', inLanguage: 'id-ID' })}></script>
@@ -69,12 +60,12 @@ const exerciseGuide = {
 					<p class="eyebrow"><span></span> Gerak sekarang, bukan nanti</p>
 					<h1>Badan lebih kuat.<br /><em>Dari rumah.</em></h1>
 					<p class="lead">Workout efektif tanpa alat, tanpa biaya, tanpa alasan. Pilih program dan mulai bergerak dalam hitungan detik.</p>
-					<div class="hero-actions"><a class="button primary" href="#program">Lihat program <span>↓</span></a><button class="button ghost" id="quick-start" type="button"><span class="play">▶</span> Latihan cepat 10 menit</button></div>
-					<div class="trust"><div class="faces" aria-hidden="true"><span>AR</span><span>DN</span><span>SF</span><span>+</span></div><p><strong>2.400+ orang</strong><br />sudah mulai bergerak</p></div>
+					<div class="hero-actions"><a class="button primary" href="#program">Lihat program <span>↓</span></a><button class="button ghost" id="quick-start" type="button"><span class="play">▶</span> <span id="quick-start-label">Latihan cepat</span></button></div>
+					<div class="trust"><div class="faces" aria-hidden="true"><span>{workouts.length}</span><span>{exerciseCount}</span><span>0</span><span>✓</span></div><p><strong>{workouts.length} program, {exerciseCount} gerakan</strong><br />tanpa alat, tanpa biaya</p></div>
 				</div>
 				<div class="hero-visual" aria-label="Ilustrasi latihan squat">
 					<div class="sun"></div><div class="figure"><div class="head"></div><div class="hair"></div><div class="body"></div><div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div></div>
-					<div class="stat stat-time"><span>◷</span><div><strong>15</strong><small>MENIT / HARI</small></div></div><div class="stat stat-place"><span>⌂</span><div><strong>0</strong><small>ALAT DIBUTUHKAN</small></div></div><p class="scribble">ruang kecil,<br /><b>hasil besar!</b></p>
+					<div class="stat stat-time"><span>◷</span><div><strong>{durationRange}</strong><small>MENIT / SESI</small></div></div><div class="stat stat-place"><span>⌂</span><div><strong>0</strong><small>ALAT DIBUTUHKAN</small></div></div><p class="scribble">ruang kecil,<br /><b>hasil besar!</b></p>
 				</div>
 			</section>
 
@@ -87,7 +78,7 @@ const exerciseGuide = {
 					{workouts.map((workout, index) => (
 						<article class={`card ${workout.color}`} data-level={workout.level} data-id={workout.id}>
 							<div class="card-top"><span class="number">0{index + 1}</span><span class="tag">{workout.level}</span></div><div class="mini-figure" aria-hidden="true"><span></span><i></i><b></b></div>
-							<div class="card-body"><p>{workout.focus}</p><h3>{workout.title}</h3><div class="meta"><span>◷ {workout.duration} menit</span><span>↻ {workout.rounds} ronde</span></div><div class="card-actions"><button class="details-workout" type="button">Detail</button><button class="start-workout" type="button">Mulai latihan <span>→</span></button></div></div>
+							<div class="card-body"><p>{workout.focus}</p><h3>{workout.title}</h3><div class="meta"><span>◷ ≈ {workout.duration} menit</span><span>↻ {workout.rounds} ronde</span></div><div class="card-actions"><button class="details-workout" type="button">Detail</button><button class="start-workout" type="button">Mulai latihan <span>→</span></button></div></div>
 						</article>
 					))}
 				</div>
@@ -100,7 +91,7 @@ const exerciseGuide = {
 
 			<section class="progress wrap" id="progres">
 				<div><p class="eyebrow"><span></span> Progres minggu ini</p><h2>Konsisten lebih penting<br />daripada sempurna.</h2><p>Setiap latihan selesai otomatis tersimpan di perangkat ini.</p></div>
-				<div class="progress-card"><div class="progress-title"><div><small>LATIHAN SELESAI</small><strong id="completed-count">0</strong><span> / <b id="weekly-goal">4</b> minggu ini</span></div><span class="bolt">ϟ</span></div><div class="bar"><span id="progress-bar"></span></div><div class="days">{['S', 'S', 'R', 'K', 'J', 'S', 'M'].map((day, index) => <div data-day={index}><i>✓</i><span>{day}</span></div>)}</div><div class="progress-stats"><span><b id="streak-count">0</b> hari streak</span><span><b id="total-minutes">0</b> total menit</span></div><div class="progress-controls"><label>Target <select id="goal-select"><option>3</option><option selected>4</option><option>5</option><option>7</option></select> / minggu</label><button id="export-progress" type="button">Export data</button><button id="reset-progress" type="button">Reset</button></div></div>
+				<div class="progress-card"><div class="progress-title"><div><small>LATIHAN SELESAI</small><strong id="completed-count">0</strong><span> / <b id="weekly-goal">{DEFAULT_GOAL}</b> minggu ini</span></div><span class="bolt">ϟ</span></div><div class="bar"><span id="progress-bar"></span></div><div class="days">{dayLabels.map((day, index) => <div data-day={index} data-day-name={day} aria-label={day}><i aria-hidden="true">✓</i><span>{day.slice(0, 3)}</span></div>)}</div><div class="progress-stats"><span><b id="streak-count">0</b> hari streak</span><span><b id="total-minutes">0</b> total menit</span></div><div class="progress-controls"><label>Target <select id="goal-select"><option>3</option><option selected>4</option><option>5</option><option>7</option></select> / minggu</label><button id="export-progress" type="button">Export data</button><button id="import-progress" type="button">Import data</button><button id="reset-progress" type="button">Reset</button></div><input id="import-file" type="file" accept="application/json,.json" hidden /><div class="history"><h3>Riwayat terakhir</h3><ul id="history-list"></ul><p id="history-status" role="status" aria-live="polite"></p></div></div>
 			</section>
 			<section class="safety wrap"><strong>⚠ Dengarkan tubuhmu.</strong><span>Berhenti bila terasa nyeri tajam, pusing, atau sesak. Konsultasikan kondisi medis dengan tenaga kesehatan sebelum mulai.</span></section>
 		</main>
@@ -108,92 +99,474 @@ const exerciseGuide = {
 		<footer><div class="wrap"><a class="brand" href="#top"><span>G</span>GERAK</a><p>Gerak kecil hari ini. Badan kuat esok hari.</p><div class="footer-actions"><button id="share-site" type="button">Bagikan</button><small>© 2026 GERAK</small></div></div></footer>
 
 		<dialog id="detail-modal"><button class="close close-detail" aria-label="Tutup" type="button">×</button><p class="modal-kicker">TENTANG PROGRAM</p><h2 id="detail-title"></h2><p id="detail-target"></p><div class="program-summary"><span id="detail-duration"></span><span id="detail-rounds"></span></div><div class="detail-box"><strong>Tips program</strong><span id="detail-tip"></span></div><div class="exercise-list" id="exercise-list"></div><div class="modal-actions"><button id="detail-start" class="button primary" type="button">Mulai latihan</button><button id="detail-share" class="button ghost" type="button">Bagikan</button></div></dialog>
-		<dialog id="workout-modal"><button class="close" id="close-modal" aria-label="Tutup" type="button">×</button><p class="modal-kicker" id="phase-label">LATIHAN BERLANGSUNG</p><h2 id="modal-title">Full Body Starter</h2><div class="round" id="round-label">Ronde 1 / 3</div><label class="interval-choice">Interval <select id="interval-choice"><option value="20,10">20 / 10</option><option value="30,15" selected>30 / 15</option><option value="40,20">40 / 20</option></select></label><div class="timer-ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="53"></circle><circle id="timer-progress" cx="60" cy="60" r="53"></circle></svg><strong id="timer">30</strong><span>DETIK</span></div><h3 id="exercise-name">Jumping Jack</h3><p id="timer-status">Siap? Tekan mulai.</p><details class="active-guide"><summary>Cara melakukan</summary><p id="active-steps"></p><small id="active-avoid"></small></details><div class="modal-actions"><button id="timer-toggle" class="button primary" type="button">Mulai</button><button id="timer-skip" class="button ghost" type="button">Lewati →</button></div></dialog>
+		<dialog id="workout-modal"><button class="close" id="close-modal" aria-label="Tutup" type="button">×</button><p class="modal-kicker" id="phase-label">LATIHAN BERLANGSUNG</p><h2 id="modal-title">Full Body Starter</h2><div class="round" id="round-label">Ronde 1 / 3</div><div class="modal-tools"><label class="interval-choice">Interval <select id="interval-choice">{intervalOptions.map(option => <option value={option.value} selected={option.value === `${DEFAULT_WORK},${DEFAULT_REST}`}>{option.label}</option>)}</select></label><button id="mute-toggle" type="button" aria-pressed="false">Suara: aktif</button></div><div class="timer-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="53"></circle><circle id="timer-progress" cx="60" cy="60" r="53"></circle></svg><strong id="timer" aria-hidden="true">30</strong><span aria-hidden="true">DETIK</span></div><h3 id="exercise-name">Jumping Jack</h3><p id="timer-status" role="status" aria-live="polite">Siap? Tekan mulai.</p><p class="next-up" id="next-up"></p><details class="active-guide"><summary>Cara melakukan</summary><p id="active-steps"></p><small id="active-avoid"></small></details><div class="modal-actions"><button id="timer-toggle" class="button primary" type="button">Mulai</button><button id="timer-skip" class="button ghost" type="button">Lewati →</button></div><div class="finish-actions" id="finish-actions" hidden><button id="finish-next" class="button ghost" type="button">Program berikutnya</button><button id="finish-share" class="button ghost" type="button">Bagikan hasil</button></div></dialog>
 
-		<script define:vars={{ workouts, exerciseGuide }}>
-			const modal = document.querySelector('#workout-modal');
-			const timerText = document.querySelector('#timer'), timerProgress = document.querySelector('#timer-progress');
-			const title = document.querySelector('#modal-title'), exerciseName = document.querySelector('#exercise-name');
-			const roundLabel = document.querySelector('#round-label'), status = document.querySelector('#timer-status');
-			const toggle = document.querySelector('#timer-toggle'), phaseLabel = document.querySelector('#phase-label');
-			const showExerciseGuide = name => { const guide = exerciseGuide[name]; document.querySelector('#active-steps').textContent = guide.steps; document.querySelector('#active-avoid').textContent = `Hindari: ${guide.avoid}`; };
-			let selected, interval, phase = 'work', seconds = 30, exerciseIndex = 0, round = 1, running = false, workSeconds = 30, restSeconds = 15, endAt = 0, lastSecond = -1, wakeLock = null, audioCtx;
-			const json = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); } catch { return fallback; } };
-			const localDate = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-			const weekKey = () => { const date = new Date(); date.setDate(date.getDate() - (date.getDay() + 6) % 7); return `gerak-progress-${localDate(date)}`; };
-			const beep = (frequency = 880, duration = 0.1) => { try { audioCtx ||= new (window.AudioContext || window.webkitAudioContext)(); const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(); osc.type = 'sine'; osc.frequency.value = frequency; gain.gain.setValueAtTime(0.15, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration); osc.connect(gain).connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration); } catch {} };
-			const requestWakeLock = async () => { try { wakeLock = await navigator.wakeLock?.request('screen'); } catch {} };
-			const releaseWakeLock = async () => { try { await wakeLock?.release(); } catch {} wakeLock = null; };
+		<script type="application/json" id="gerak-data" set:html={JSON.stringify({ workouts, exerciseGuide }).replace(/</g, '\\u003c')}></script>
+		<script>
+			import {
+				computeStreak, dayIndex, formatShortDate, localDate, mergeHistory, progressPercent,
+				sanitizeHistory, totalMinutes, weekKey,
+				DEFAULT_GOAL, GOAL_KEY, HISTORY_KEY, LAST_PROGRAM_KEY, LAST_WORKOUT_KEY, MUTE_KEY,
+				type HistoryEntry,
+			} from '../lib/progress';
+			import {
+				advance, isFinalSet, nextUpLabel, parseInterval, phaseSeconds,
+				DEFAULT_REST, DEFAULT_WORK, READY_SECONDS, type Phase,
+			} from '../lib/timer';
+			import type { ExerciseGuide, Workout } from '../data/workouts';
+
+			interface GerakData {
+				workouts: Workout[];
+				exerciseGuide: Record<string, ExerciseGuide>;
+			}
+
+			const select = <T extends Element>(selector: string): T => {
+				const element = document.querySelector<T>(selector);
+				if (!element) throw new Error(`GERAK: elemen tidak ditemukan — ${selector}`);
+				return element;
+			};
+
+			const dataElement = select<HTMLScriptElement>('#gerak-data');
+			const { workouts, exerciseGuide } = JSON.parse(dataElement.textContent ?? '{"workouts":[],"exerciseGuide":{}}') as GerakData;
+
+			const modal = select<HTMLDialogElement>('#workout-modal');
+			const detailModal = select<HTMLDialogElement>('#detail-modal');
+			const timerText = select<HTMLElement>('#timer');
+			const timerProgress = select<SVGCircleElement>('#timer-progress');
+			const title = select<HTMLElement>('#modal-title');
+			const exerciseName = select<HTMLElement>('#exercise-name');
+			const roundLabel = select<HTMLElement>('#round-label');
+			const status = select<HTMLElement>('#timer-status');
+			const nextUp = select<HTMLElement>('#next-up');
+			const toggle = select<HTMLButtonElement>('#timer-toggle');
+			const phaseLabel = select<HTMLElement>('#phase-label');
+			const activeSteps = select<HTMLElement>('#active-steps');
+			const activeAvoid = select<HTMLElement>('#active-avoid');
+			const intervalChoice = select<HTMLSelectElement>('#interval-choice');
+			const skipButton = select<HTMLButtonElement>('#timer-skip');
+			const muteToggle = select<HTMLButtonElement>('#mute-toggle');
+			const finishActions = select<HTMLElement>('#finish-actions');
+			const quickStartLabel = select<HTMLElement>('#quick-start-label');
+			const completedCount = select<HTMLElement>('#completed-count');
+			const weeklyGoal = select<HTMLElement>('#weekly-goal');
+			const goalSelect = select<HTMLSelectElement>('#goal-select');
+			const progressBar = select<HTMLElement>('#progress-bar');
+			const totalMinutesLabel = select<HTMLElement>('#total-minutes');
+			const streakLabel = select<HTMLElement>('#streak-count');
+			const historyList = select<HTMLUListElement>('#history-list');
+			const historyStatus = select<HTMLElement>('#history-status');
+			const importFile = select<HTMLInputElement>('#import-file');
+			const dayCells = document.querySelectorAll<HTMLDivElement>('.days div');
+
+			let selected: Workout = workouts[0];
+			let interval: ReturnType<typeof setInterval> | undefined;
+			let phase: Phase = 'work';
+			let seconds = DEFAULT_WORK;
+			let exerciseIndex = 0;
+			let round = 1;
+			let running = false;
+			let started = false;
+			let workSeconds = DEFAULT_WORK;
+			let restSeconds = DEFAULT_REST;
+			let endAt = 0;
+			let lastSecond = -1;
+			let elapsedSeconds = 0;
+			let muted = localStorage.getItem(MUTE_KEY) === 'true';
+			let wakeLock: WakeLockSentinel | null = null;
+			let audioCtx: AudioContext | undefined;
+
+			const json = <T,>(key: string, fallback: T): T => {
+				try {
+					const raw = localStorage.getItem(key);
+					return raw ? (JSON.parse(raw) as T) : fallback;
+				} catch {
+					return fallback;
+				}
+			};
+
+			const readHistory = (): HistoryEntry[] => sanitizeHistory(json<unknown>(HISTORY_KEY, []));
+
+			const beep = (frequency = 880, duration = 0.1) => {
+				if (muted) return;
+				try {
+					audioCtx ??= new AudioContext();
+					const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+					osc.type = 'sine';
+					osc.frequency.value = frequency;
+					gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+					gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+					osc.connect(gain).connect(audioCtx.destination);
+					osc.start();
+					osc.stop(audioCtx.currentTime + duration);
+				} catch {}
+			};
+
+			const speak = (text: string) => {
+				if (muted || !('speechSynthesis' in window)) return;
+				speechSynthesis.cancel();
+				speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+			};
+
+			const requestWakeLock = async () => {
+				try { wakeLock = await navigator.wakeLock?.request('screen') ?? null; } catch {}
+			};
+
+			const releaseWakeLock = async () => {
+				try { await wakeLock?.release(); } catch {}
+				wakeLock = null;
+			};
+
+			const showExerciseGuide = (name: string) => {
+				const guide = exerciseGuide[name];
+				if (!guide) return;
+				activeSteps.textContent = guide.steps;
+				activeAvoid.textContent = `Hindari: ${guide.avoid}`;
+			};
+
+			const renderHistory = () => {
+				const recent = readHistory().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+				historyList.replaceChildren();
+				if (recent.length === 0) {
+					const empty = document.createElement('li');
+					empty.className = 'empty';
+					empty.textContent = 'Belum ada latihan selesai.';
+					historyList.append(empty);
+					return;
+				}
+				for (const item of recent) {
+					const entry = document.createElement('li');
+					const name = document.createElement('strong');
+					name.textContent = item.workout;
+					const meta = document.createElement('span');
+					meta.textContent = `${formatShortDate(item.date)} · ${item.minutes} menit`;
+					entry.append(name, meta);
+					historyList.append(entry);
+				}
+			};
+
 			const updateProgress = () => {
-				const completed = json(weekKey(), []), history = json('gerak-history', []), goal = Number(localStorage.getItem('gerak-goal') || 4);
-				document.querySelector('#completed-count').textContent = completed.length;
-				document.querySelector('#weekly-goal').textContent = goal; document.querySelector('#goal-select').value = goal;
-				document.querySelector('#progress-bar').style.width = `${Math.min(completed.length / goal * 100, 100)}%`;
-				document.querySelectorAll('.days div').forEach((day, index) => day.classList.toggle('done', completed.includes(index)));
-				document.querySelector('#total-minutes').textContent = history.reduce((sum, item) => sum + item.minutes, 0);
-				const dates = [...new Set(history.map(item => item.date))].sort().reverse(); let streak = 0, cursor = new Date();
-				while (dates.includes(localDate(cursor))) { streak++; cursor.setDate(cursor.getDate() - 1); }
-				document.querySelector('#streak-count').textContent = streak;
+				const today = new Date();
+				const completed = json<number[]>(weekKey(today), []);
+				const history = readHistory();
+				const goal = Number(localStorage.getItem(GOAL_KEY) ?? DEFAULT_GOAL);
+				completedCount.textContent = String(completed.length);
+				weeklyGoal.textContent = String(goal);
+				goalSelect.value = String(goal);
+				progressBar.style.width = `${progressPercent(completed.length, goal)}%`;
+				dayCells.forEach((day, index) => {
+					const done = completed.includes(index);
+					day.classList.toggle('done', done);
+					const name = day.dataset.dayName ?? '';
+					day.setAttribute('aria-label', done ? `${name} selesai` : name);
+				});
+				totalMinutesLabel.textContent = String(totalMinutes(history));
+				streakLabel.textContent = String(computeStreak(history.map(item => item.date), today));
+				renderHistory();
 			};
-			const speak = text => { if ('speechSynthesis' in window) { speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(text)); } };
-			const renderTimer = () => { timerText.textContent = seconds; timerProgress.style.strokeDashoffset = 333 - (333 * seconds / (phase === 'work' ? workSeconds : restSeconds)); };
+
+			const renderTimer = () => {
+				timerText.textContent = String(seconds);
+				const total = phaseSeconds(phase, workSeconds, restSeconds);
+				timerProgress.style.strokeDashoffset = String(333 - (333 * seconds / total));
+			};
+
+			const renderMute = () => {
+				muteToggle.textContent = muted ? 'Suara: mati' : 'Suara: aktif';
+				muteToggle.setAttribute('aria-pressed', String(muted));
+			};
+
+			const saveSession = (minutes: number) => {
+				const now = new Date();
+				const completed = json<number[]>(weekKey(now), []);
+				const todayIndex = dayIndex(now);
+				if (!completed.includes(todayIndex)) completed.push(todayIndex);
+				localStorage.setItem(weekKey(now), JSON.stringify(completed));
+				localStorage.setItem(LAST_WORKOUT_KEY, now.toISOString());
+				localStorage.setItem(LAST_PROGRAM_KEY, selected.id);
+				const history = readHistory();
+				history.push({ date: localDate(now), workout: selected.title, minutes });
+				localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+				updateProgress();
+			};
+
 			const finish = () => {
-				clearInterval(interval); running = false; releaseWakeLock(); beep(660, 0.25);
-				const completed = json(weekKey(), []), today = new Date().getDay(), dayIndex = today === 0 ? 6 : today - 1;
-				if (!completed.includes(dayIndex)) completed.push(dayIndex);
-				localStorage.setItem(weekKey(), JSON.stringify(completed)); localStorage.setItem('gerak-last-workout', new Date().toISOString());
-				const history = json('gerak-history', []); history.push({ date: localDate(new Date()), workout: selected.title, minutes: selected.duration }); localStorage.setItem('gerak-history', JSON.stringify(history)); updateProgress();
-				title.textContent = 'Latihan selesai!'; exerciseName.textContent = 'Kerja bagus.'; status.textContent = 'Satu langkah lebih kuat dari kemarin.'; toggle.textContent = 'Tutup'; toggle.dataset.finished = 'true'; speak('Latihan selesai. Kerja bagus.');
+				clearInterval(interval);
+				running = false;
+				void releaseWakeLock();
+				beep(660, 0.35);
+				const minutes = Math.max(1, Math.round(elapsedSeconds / 60));
+				saveSession(minutes);
+				title.textContent = 'Latihan selesai!';
+				exerciseName.textContent = 'Kerja bagus.';
+				status.textContent = `${minutes} menit tercatat. Satu langkah lebih kuat dari kemarin.`;
+				nextUp.textContent = '';
+				toggle.textContent = 'Tutup';
+				toggle.dataset.finished = 'true';
+				skipButton.disabled = true;
+				finishActions.hidden = false;
+				speak('Latihan selesai. Kerja bagus.');
 			};
-			const nextExercise = () => {
-				phase = 'work'; exerciseIndex++;
-				if (exerciseIndex >= selected.exercises.length) { exerciseIndex = 0; round++; }
-				if (round > selected.rounds) return finish();
-				seconds = workSeconds; lastSecond = -1; if (running) endAt = Date.now() + seconds * 1000; phaseLabel.textContent = 'LATIHAN BERLANGSUNG'; exerciseName.textContent = selected.exercises[exerciseIndex]; showExerciseGuide(selected.exercises[exerciseIndex]); roundLabel.textContent = `Ronde ${round} / ${selected.rounds}`; status.textContent = 'Jaga napas. Kamu bisa.'; renderTimer(); speak(selected.exercises[exerciseIndex]);
+
+			const showWork = (announcement?: string) => {
+				phase = 'work';
+				seconds = workSeconds;
+				lastSecond = -1;
+				if (running) endAt = Date.now() + seconds * 1000;
+				phaseLabel.textContent = 'LATIHAN BERLANGSUNG';
+				exerciseName.textContent = selected.exercises[exerciseIndex];
+				showExerciseGuide(selected.exercises[exerciseIndex]);
+				roundLabel.textContent = `Ronde ${round} / ${selected.rounds}`;
+				status.textContent = 'Jaga napas. Kamu bisa.';
+				nextUp.textContent = '';
+				renderTimer();
+				speak(announcement ?? selected.exercises[exerciseIndex]);
 			};
-			const rest = () => { phase = 'rest'; seconds = restSeconds; lastSecond = -1; if (running) endAt = Date.now() + seconds * 1000; phaseLabel.textContent = 'ISTIRAHAT'; exerciseName.textContent = 'Tarik napas'; status.textContent = 'Siapkan gerakan berikutnya.'; renderTimer(); speak('Istirahat'); };
+
+			const startRest = () => {
+				phase = 'rest';
+				seconds = restSeconds;
+				lastSecond = -1;
+				if (running) endAt = Date.now() + seconds * 1000;
+				phaseLabel.textContent = 'ISTIRAHAT';
+				exerciseName.textContent = 'Tarik napas';
+				status.textContent = 'Siapkan gerakan berikutnya.';
+				nextUp.textContent = nextUpLabel(selected.exercises, exerciseIndex, round, selected.rounds);
+				renderTimer();
+				beep(520, 0.12);
+				speak('Istirahat');
+			};
+
+			const moveToNextExercise = () => {
+				const next = advance(exerciseIndex, round, selected.exercises.length, selected.rounds);
+				if (next.done) return finish();
+				const roundChanged = next.round !== round;
+				exerciseIndex = next.exerciseIndex;
+				round = next.round;
+				const name = selected.exercises[exerciseIndex];
+				showWork(roundChanged ? `Ronde ${round} dari ${selected.rounds}. ${name}` : name);
+			};
+
+			const completePhase = () => {
+				if (toggle.dataset.finished) return;
+				if (phase === 'ready') {
+					beep(880, 0.12);
+					return showWork();
+				}
+				if (phase === 'work') {
+					elapsedSeconds += workSeconds;
+					if (isFinalSet(exerciseIndex, round, selected.exercises.length, selected.rounds)) return finish();
+					return startRest();
+				}
+				elapsedSeconds += restSeconds;
+				return moveToNextExercise();
+			};
+
 			const tick = () => {
 				seconds = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
-				if (seconds !== lastSecond) { lastSecond = seconds; renderTimer(); if (seconds > 0 && seconds <= 3) beep(880, 0.08); }
-				if (seconds <= 0) { if (phase === 'work') rest(); else nextExercise(); }
+				if (seconds !== lastSecond) {
+					lastSecond = seconds;
+					renderTimer();
+					if (seconds > 0 && seconds <= 3) beep(phase === 'work' ? 660 : 520, 0.08);
+				}
+				if (seconds <= 0) completePhase();
 			};
-			const openWorkout = id => {
-				selected = workouts.find(item => item.id === id) || workouts[1]; clearInterval(interval); running = false; releaseWakeLock(); phase = 'work'; seconds = workSeconds; lastSecond = -1; exerciseIndex = 0; round = 1;
-				title.textContent = selected.title; phaseLabel.textContent = 'LATIHAN BERLANGSUNG'; exerciseName.textContent = selected.exercises[0]; showExerciseGuide(selected.exercises[0]); roundLabel.textContent = `Ronde 1 / ${selected.rounds}`; status.textContent = 'Siap? Tekan mulai.'; toggle.textContent = 'Mulai'; delete toggle.dataset.finished; renderTimer(); modal.showModal();
+
+			const pauseLoop = (message = 'Dijeda.') => {
+				running = false;
+				toggle.textContent = 'Lanjut';
+				status.textContent = message;
+				clearInterval(interval);
+				void releaseWakeLock();
 			};
-			const detailModal = document.querySelector('#detail-modal');
-			const showDetail = id => {
-				const item = workouts.find(workout => workout.id === id); detailModal.dataset.id = id;
-				document.querySelector('#detail-title').textContent = item.title; document.querySelector('#detail-target').textContent = `Target utama: ${item.target}`; document.querySelector('#detail-tip').textContent = item.tip;
-				document.querySelector('#detail-duration').textContent = `◷ ${item.duration} menit`; document.querySelector('#detail-rounds').textContent = `↻ ${item.rounds} ronde`;
-				document.querySelector('#exercise-list').innerHTML = item.exercises.map((name, index) => { const guide = exerciseGuide[name]; return `<details><summary><b>0${index + 1}</b><span><strong>${name}</strong><small>${guide.target}</small></span></summary><div class="exercise-guide"><p>${guide.steps}</p><p><b>Napas:</b> ${guide.breath}</p><p><b>Hindari:</b> ${guide.avoid}</p><p><b>Modifikasi:</b> ${guide.easier}</p></div></details>`; }).join('');
+
+			const runLoop = () => {
+				running = true;
+				toggle.textContent = 'Jeda';
+				void requestWakeLock();
+				interval = setInterval(tick, 250);
+			};
+
+			const startSession = () => {
+				started = true;
+				phase = 'ready';
+				seconds = READY_SECONDS;
+				lastSecond = -1;
+				endAt = Date.now() + seconds * 1000;
+				phaseLabel.textContent = 'BERSIAP';
+				exerciseName.textContent = selected.exercises[exerciseIndex];
+				showExerciseGuide(selected.exercises[exerciseIndex]);
+				status.textContent = `Mulai dalam ${READY_SECONDS} detik.`;
+				nextUp.textContent = '';
+				renderTimer();
+			};
+
+			const openWorkout = (id: string) => {
+				selected = workouts.find(item => item.id === id) ?? workouts[0];
+				clearInterval(interval);
+				running = false;
+				started = false;
+				void releaseWakeLock();
+				phase = 'work';
+				seconds = workSeconds;
+				lastSecond = -1;
+				elapsedSeconds = 0;
+				exerciseIndex = 0;
+				round = 1;
+				title.textContent = selected.title;
+				phaseLabel.textContent = 'LATIHAN BERLANGSUNG';
+				exerciseName.textContent = selected.exercises[0];
+				showExerciseGuide(selected.exercises[0]);
+				roundLabel.textContent = `Ronde 1 / ${selected.rounds}`;
+				status.textContent = 'Siap? Tekan mulai.';
+				nextUp.textContent = '';
+				toggle.textContent = 'Mulai';
+				skipButton.disabled = false;
+				finishActions.hidden = true;
+				delete toggle.dataset.finished;
+				renderTimer();
+				modal.showModal();
+			};
+
+			const showDetail = (id: string) => {
+				const item = workouts.find(workout => workout.id === id);
+				if (!item) return;
+				detailModal.dataset.id = id;
+				select<HTMLElement>('#detail-title').textContent = item.title;
+				select<HTMLElement>('#detail-target').textContent = `Target utama: ${item.target}`;
+				select<HTMLElement>('#detail-tip').textContent = item.tip;
+				select<HTMLElement>('#detail-duration').textContent = `◷ ≈ ${item.duration} menit`;
+				select<HTMLElement>('#detail-rounds').textContent = `↻ ${item.rounds} ronde`;
+				select<HTMLElement>('#exercise-list').innerHTML = item.exercises.map((name, index) => {
+					const guide = exerciseGuide[name];
+					if (!guide) return '';
+					return `<details><summary><b>0${index + 1}</b><span><strong>${name}</strong><small>${guide.target}</small></span></summary><div class="exercise-guide"><p>${guide.steps}</p><p><b>Napas:</b> ${guide.breath}</p><p><b>Hindari:</b> ${guide.avoid}</p><p><b>Modifikasi:</b> ${guide.easier}</p></div></details>`;
+				}).join('');
 				detailModal.showModal();
 			};
-			document.querySelectorAll('.start-workout').forEach(button => button.addEventListener('click', () => openWorkout(button.closest('.card').dataset.id)));
-			document.querySelectorAll('.details-workout').forEach(button => button.addEventListener('click', () => showDetail(button.closest('.card').dataset.id)));
-			document.querySelector('#quick-start').addEventListener('click', () => openWorkout('core'));
-			document.querySelector('#close-modal').addEventListener('click', () => { clearInterval(interval); running = false; modal.close(); });
-			document.querySelector('.close-detail').addEventListener('click', () => detailModal.close());
-			document.querySelector('#detail-start').addEventListener('click', () => { detailModal.close(); openWorkout(detailModal.dataset.id); });
-			document.querySelector('#detail-share').addEventListener('click', () => share(`Coba program ${document.querySelector('#detail-title').textContent} di GERAK`));
-			document.querySelector('#timer-skip').addEventListener('click', nextExercise);
-			document.querySelector('#interval-choice').addEventListener('change', event => { [workSeconds, restSeconds] = event.target.value.split(',').map(Number); if (!running) { seconds = workSeconds; phase = 'work'; renderTimer(); } });
-			toggle.addEventListener('click', () => {
-				if (toggle.dataset.finished) return modal.close();
-				running = !running; toggle.textContent = running ? 'Jeda' : 'Lanjut'; status.textContent = running ? 'Terus bergerak!' : 'Dijeda.'; clearInterval(interval);
-				if (running) { beep(880, 0.08); endAt = Date.now() + seconds * 1000; requestWakeLock(); interval = setInterval(tick, 250); } else releaseWakeLock();
+
+			const share = async (text: string) => {
+				try {
+					if (navigator.share) await navigator.share({ title: 'GERAK', text, url: location.href });
+					else await navigator.clipboard?.writeText(`${text} ${location.href}`);
+				} catch {}
+			};
+
+			document.querySelectorAll<HTMLButtonElement>('.start-workout').forEach(button => {
+				button.addEventListener('click', () => {
+					const id = button.closest<HTMLElement>('.card')?.dataset.id;
+					if (id) openWorkout(id);
+				});
 			});
-			modal.addEventListener('close', () => { clearInterval(interval); running = false; releaseWakeLock(); speechSynthesis?.cancel(); });
-			document.addEventListener('keydown', event => { if (event.key === ' ' && modal.open) { event.preventDefault(); toggle.click(); } });
-			document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && running) { requestWakeLock(); tick(); } });
-			document.querySelectorAll('.filters button').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('.filters button').forEach(item => item.classList.remove('active')); button.classList.add('active'); document.querySelectorAll('.card').forEach(card => card.hidden = button.dataset.filter !== 'Semua' && card.dataset.level !== button.dataset.filter); }));
-			document.querySelector('#goal-select').addEventListener('change', event => { localStorage.setItem('gerak-goal', event.target.value); updateProgress(); });
-			document.querySelector('#export-progress').addEventListener('click', () => { const blob = new Blob([JSON.stringify(json('gerak-history', []), null, 2)], { type: 'application/json' }); const link = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'gerak-progress.json' }); link.click(); URL.revokeObjectURL(link.href); });
-			document.querySelector('#reset-progress').addEventListener('click', () => { localStorage.removeItem(weekKey()); localStorage.removeItem('gerak-progress'); localStorage.removeItem('gerak-history'); localStorage.removeItem('gerak-last-workout'); updateProgress(); });
-			const share = async text => { if (navigator.share) await navigator.share({ title: 'GERAK', text, url: location.href }); else await navigator.clipboard?.writeText(`${text} ${location.href}`); };
-			document.querySelector('#share-site').addEventListener('click', () => share('Workout di rumah tanpa alat — GERAK'));
-			if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
-			localStorage.removeItem('gerak-progress');
+			document.querySelectorAll<HTMLButtonElement>('.details-workout').forEach(button => {
+				button.addEventListener('click', () => {
+					const id = button.closest<HTMLElement>('.card')?.dataset.id;
+					if (id) showDetail(id);
+				});
+			});
+			select<HTMLButtonElement>('#quick-start').addEventListener('click', () => openWorkout(selected.id));
+			select<HTMLButtonElement>('#close-modal').addEventListener('click', () => { clearInterval(interval); running = false; modal.close(); });
+			select<HTMLButtonElement>('.close-detail').addEventListener('click', () => detailModal.close());
+			select<HTMLButtonElement>('#detail-start').addEventListener('click', () => { detailModal.close(); openWorkout(detailModal.dataset.id ?? ''); });
+			select<HTMLButtonElement>('#detail-share').addEventListener('click', () => {
+				void share(`Coba program ${select<HTMLElement>('#detail-title').textContent ?? ''} di GERAK`);
+			});
+			skipButton.addEventListener('click', completePhase);
+			select<HTMLButtonElement>('#finish-share').addEventListener('click', () => {
+				void share(`Selesai ${selected.title} di GERAK`);
+			});
+			select<HTMLButtonElement>('#finish-next').addEventListener('click', () => {
+				const index = workouts.findIndex(workout => workout.id === selected.id);
+				const next = workouts[(index + 1) % workouts.length];
+				openWorkout(next.id);
+			});
+			muteToggle.addEventListener('click', () => {
+				muted = !muted;
+				localStorage.setItem(MUTE_KEY, String(muted));
+				if (muted) speechSynthesis?.cancel();
+				renderMute();
+			});
+			intervalChoice.addEventListener('change', () => {
+				[workSeconds, restSeconds] = parseInterval(intervalChoice.value);
+				if (!running && !started) { phase = 'work'; seconds = workSeconds; lastSecond = -1; renderTimer(); }
+			});
+			toggle.addEventListener('click', () => {
+				if (toggle.dataset.finished) { modal.close(); return; }
+				if (running) { pauseLoop(); return; }
+				if (!started) { startSession(); runLoop(); return; }
+				endAt = Date.now() + seconds * 1000;
+				status.textContent = 'Terus bergerak!';
+				runLoop();
+			});
+			modal.addEventListener('close', () => {
+				clearInterval(interval);
+				running = false;
+				void releaseWakeLock();
+				speechSynthesis?.cancel();
+			});
+			document.addEventListener('keydown', event => {
+				if (event.key === ' ' && modal.open) { event.preventDefault(); toggle.click(); }
+			});
+			document.addEventListener('visibilitychange', () => {
+				if (document.visibilityState === 'hidden' && running) { pauseLoop('Dijeda otomatis: tab tidak aktif.'); return; }
+				if (document.visibilityState === 'visible' && running) { void requestWakeLock(); tick(); }
+			});
+			document.querySelectorAll<HTMLButtonElement>('.filters button').forEach(button => {
+				button.addEventListener('click', () => {
+					document.querySelectorAll<HTMLButtonElement>('.filters button').forEach(item => item.classList.remove('active'));
+					button.classList.add('active');
+					const filter = button.dataset.filter;
+					document.querySelectorAll<HTMLElement>('.card').forEach(card => {
+						card.hidden = filter !== 'Semua' && card.dataset.level !== filter;
+					});
+				});
+			});
+			goalSelect.addEventListener('change', () => {
+				localStorage.setItem(GOAL_KEY, goalSelect.value);
+				updateProgress();
+			});
+			select<HTMLButtonElement>('#export-progress').addEventListener('click', () => {
+				const payload = { goal: Number(localStorage.getItem(GOAL_KEY) ?? DEFAULT_GOAL), history: readHistory() };
+				const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+				const link = document.createElement('a');
+				link.href = URL.createObjectURL(blob);
+				link.download = 'gerak-progress.json';
+				link.click();
+				URL.revokeObjectURL(link.href);
+			});
+			select<HTMLButtonElement>('#import-progress').addEventListener('click', () => importFile.click());
+			importFile.addEventListener('change', async () => {
+				const file = importFile.files?.[0];
+				if (!file) return;
+				try {
+					const parsed = JSON.parse(await file.text()) as unknown;
+					const incoming = sanitizeHistory(Array.isArray(parsed) ? parsed : (parsed as { history?: unknown }).history);
+					if (incoming.length === 0) { historyStatus.textContent = 'Tidak ada data latihan yang bisa dibaca.'; return; }
+					const merged = mergeHistory(readHistory(), incoming);
+					localStorage.setItem(HISTORY_KEY, JSON.stringify(merged));
+					updateProgress();
+					historyStatus.textContent = `${incoming.length} latihan diimpor.`;
+				} catch {
+					historyStatus.textContent = 'File tidak bisa dibaca.';
+				} finally {
+					importFile.value = '';
+				}
+			});
+			select<HTMLButtonElement>('#reset-progress').addEventListener('click', () => {
+				if (!confirm('Hapus semua progres latihan di perangkat ini? Tindakan ini tidak bisa dibatalkan.')) return;
+				localStorage.removeItem(weekKey(new Date()));
+				localStorage.removeItem(HISTORY_KEY);
+				localStorage.removeItem(LAST_WORKOUT_KEY);
+				localStorage.removeItem(LAST_PROGRAM_KEY);
+				historyStatus.textContent = 'Progres dihapus.';
+				updateProgress();
+			});
+			select<HTMLButtonElement>('#share-site').addEventListener('click', () => { void share('Workout di rumah tanpa alat — GERAK'); });
+			if ('serviceWorker' in navigator) void navigator.serviceWorker.register('/sw.js').catch(() => {});
+
+			const lastProgram = workouts.find(workout => workout.id === localStorage.getItem(LAST_PROGRAM_KEY));
+			if (lastProgram) { selected = lastProgram; quickStartLabel.textContent = `Lanjutkan ${lastProgram.title}`; }
+			else quickStartLabel.textContent = `Latihan cepat ${workouts[0].duration} menit`;
+			renderMute();
 			updateProgress();
 		</script>
 	</body>
@@ -219,4 +592,56 @@ const exerciseGuide = {
 	.progress-controls{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:18px;flex-wrap:wrap}.progress-controls label,.interval-choice{font-size:11px;font-weight:700}.progress-controls select,.interval-choice select{padding:5px;border:1px solid var(--line);border-radius:7px;background:white}.progress-controls button{background:none;border:0;text-decoration:underline;color:#666;font-size:11px;cursor:pointer}.interval-choice{display:block;margin-top:12px}
 	@media(max-width:620px){.safety{align-items:flex-start;flex-direction:column}.card-actions{align-items:stretch}.footer-actions{flex-direction:column}}
 	.program-summary{display:flex;gap:10px;margin:15px 0}.program-summary span{background:var(--lime);border:1px solid var(--ink);border-radius:99px;padding:7px 10px;font-size:11px;font-weight:700}.exercise-list{margin-top:18px;text-align:left;max-height:330px;overflow:auto;border-top:1px solid var(--line)}.exercise-list details{border-bottom:1px solid var(--line)}.exercise-list summary{display:flex;align-items:center;gap:12px;padding:14px 4px;cursor:pointer;list-style:none}.exercise-list summary::-webkit-details-marker{display:none}.exercise-list summary>b{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--lime);font-size:11px}.exercise-list summary span{display:grid;gap:3px}.exercise-list summary strong{font-size:14px}.exercise-list summary small{color:#777;font-size:11px}.exercise-guide{padding:0 8px 14px 44px;color:#606660;font-size:12px;line-height:1.55}.exercise-guide p{margin:6px 0}.active-guide{margin:14px 0;text-align:left;background:#f8f9f6;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px}.active-guide summary{cursor:pointer;font-weight:700}.active-guide p{color:#636963;line-height:1.5;margin:10px 0 5px}.active-guide small{color:#a9502f}
+
+	/* sticky nav so the CTA stays reachable on a long page */
+	.nav{position:sticky;top:0;z-index:30;background:var(--cream);backdrop-filter:blur(10px)}
+
+	/* history + modal tools */
+	.history{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);text-align:left}
+	.history h3{font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+	.history ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+	.history li{display:flex;justify-content:space-between;gap:12px;font-size:12px;padding:9px 11px;background:#f8f9f6;border:1px solid var(--line);border-radius:10px}
+	.history li span{color:#777;white-space:nowrap}
+	.history li.empty{justify-content:center;color:#777;background:none;border-style:dashed}
+	#history-status{margin:10px 0 0;font-size:11px;color:#777;min-height:14px}
+	.modal-tools{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+	.interval-choice{display:inline-flex;align-items:center;gap:6px;margin:0}
+	#mute-toggle{background:none;border:1px solid var(--line);border-radius:99px;padding:5px 11px;font-size:11px;font-weight:700;cursor:pointer}
+	#mute-toggle[aria-pressed='true']{border-color:var(--ink);background:var(--ink);color:var(--cream)}
+	.next-up{margin:0;font-size:12px;font-weight:700;color:#52720d;min-height:16px}
+	.finish-actions{display:flex;justify-content:center;gap:10px;margin-top:12px}
+	.finish-actions[hidden]{display:none}
+	.button:disabled{opacity:.45;cursor:not-allowed}
+	@media(max-width:620px){.nav{position:static}.modal-tools,.finish-actions{flex-direction:column;align-items:stretch}}
+
+	/* dark mode: pastel cards keep their own dark-on-light palette */
+	@media (prefers-color-scheme: dark){
+		:root{--cream:#141810;--line:#333a2d;--white:#1b2117}
+		body{background:var(--cream);color:#e9eee4}
+		.nav{background:var(--cream)}
+		.lead,.trust,.section-head>p,.progress>div>p:last-child,.card-body p,.meta{color:#9aa394}
+		.trust strong{color:#e9eee4}
+		.card{color:#18201a}
+		.card-body{background:#f3f6ee}
+		.stat,.progress-card{background:#1b2117;color:#e9eee4}
+		.stat strong,.progress-title strong{color:#e9eee4}
+		.bar{background:#2b3226}
+		.days i{border-color:#3d4536}
+		.days span{color:#8f978a}
+		.detail-box,.active-guide{background:#1e2419;border-color:var(--line)}
+		.exercise-guide,.active-guide p{color:#a9b1a4}
+		.exercise-list summary small{color:#8f978a}
+		.history li{background:#1e2419;border-color:var(--line)}
+		.history li span,#history-status,.progress-controls button{color:#9aa394}
+		.progress-controls select,.interval-choice select{background:#1b2117;color:#e9eee4;border-color:var(--line)}
+		.filters button{border-color:var(--line);color:#e9eee4}
+		.filters button.active{background:#e9eee4;color:#141810;border-color:#e9eee4}
+		dialog{background:#1b2117;color:#e9eee4}
+		.timer-ring circle{stroke:#2b3226}
+		.safety{background:#2a2415;border-color:#4a3d1e;color:#e3c98f}
+		footer{background:#1a1f16}footer p,footer small{color:#8f978a}
+		#share-site,#mute-toggle,.details-workout{border-color:var(--line);color:#e9eee4}
+		#mute-toggle[aria-pressed='true']{background:#e9eee4;color:#141810;border-color:#e9eee4}
+		.next-up{color:#c7f13c}
+	}
 </style>
